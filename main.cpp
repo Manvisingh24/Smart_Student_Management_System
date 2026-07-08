@@ -42,7 +42,25 @@ void addStudent()
 
     cout<<"\nStudent Added Successfully!\n";
 }
+void displayStudents(){
+    if(students.empty()){
+        cout<<"No Stdudents found!"<<endl;
+        return;
+    }
+    cout<<"\n=====STUDENTS LIST=====\n";
+
+    for(int i=0; i<students.size(); i++){
+        cout<<"\nRoll Number :"<< students[i].rollNo << endl;
+        cout<<"Name :"<< students[i].name << endl;
+        cout<<"Age :"<< students[i].age << endl;
+        cout<<"Course :"<< students[i].course << endl;
+        cout<<"Marks :"<< students[i].marks << endl;
+        cout<<"---------------------------"<<endl;
+    }
+}
+
 int main(){
     addStudent();
+    displayStudents();
     return 0;
 }
