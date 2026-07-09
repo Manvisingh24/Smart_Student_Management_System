@@ -60,7 +60,36 @@ void displayStudents(){
 }
 
 int main(){
-    addStudent();
-    displayStudents();
+    int choice;
+
+    while(true)
+    {
+        cout << "==================================" << endl;
+        cout << " SMART STUDENT MANAGEMENT SYSTEM" << endl;
+        cout << "==================================" << endl;
+        cout << "1. Add Student" << endl;
+        cout << "2. Display Students" << endl;
+        cout << "3. Exit" << endl;
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        switch(choice)
+        {
+            case 1:
+            addStudent();
+            break;
+
+            case 2:
+            displayStudents();
+            break;
+
+            case 3:
+            cout << "Thank you for using the system!" << endl;
+            break;
+
+            default:
+            cout << "Invalid Choice!" << endl;
+        }
+    }
     return 0;
 }
