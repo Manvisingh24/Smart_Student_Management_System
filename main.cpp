@@ -58,6 +58,35 @@ void displayStudents(){
         cout<<"---------------------------"<<endl;
     }
 }
+void searchStudents(){
+    int roll;
+
+    cout<<"Enter Roll Number to search:";
+    cin>>roll;
+
+    bool found = false;
+
+    for(int i=0; i<students.size(); i++){
+
+        if(students[i].rollNo == roll)
+        {
+            found = true;
+
+        cout << "\nStudent Found!" << endl;
+         cout << "Roll Number : " << students[i].rollNo << endl;
+        cout << "Name : " << students[i].name << endl;
+        cout << "Age : " << students[i].age << endl;
+        cout << "Course : " << students[i].course << endl;
+        cout << "Marks : " << students[i].marks << endl;
+
+        break;
+        }
+    }
+    if(!found)
+{
+    cout << "Student Not Found!" << endl;
+}
+}
 
 int main(){
     int choice;
@@ -69,7 +98,8 @@ int main(){
         cout << "==================================" << endl;
         cout << "1. Add Student" << endl;
         cout << "2. Display Students" << endl;
-        cout << "3. Exit" << endl;
+        cout << "3. Search Student" << endl;
+        cout << "4. Exit" << endl;
         cout << "Enter your choice: ";
         cin >> choice;
 
@@ -84,7 +114,11 @@ int main(){
             break;
 
             case 3:
-            cout << "Thank you for using the system!" << endl;
+            searchStudents();
+            break;
+
+            case 4:
+            cout << "Thank you for using the Smart Student Management System!" << endl;
             break;
 
             default:
