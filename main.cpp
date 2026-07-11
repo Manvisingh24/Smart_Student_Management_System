@@ -42,7 +42,7 @@ void addStudent()
 
     cout<<"\nStudent Added Successfully!\n";
 }
-void displayStudents(){
+void displayStudent(){
     if(students.empty()){
         cout<<"No Stdudents found!"<<endl;
         return;
@@ -58,7 +58,7 @@ void displayStudents(){
         cout<<"---------------------------"<<endl;
     }
 }
-void searchStudents(){
+void searchStudent(){
     int roll;
 
     cout<<"Enter Roll Number to search:";
@@ -113,6 +113,44 @@ void deleteStudent(){
         cout << "Student Not Found!" << endl;
     }
 }
+void updateStudent(){
+    int roll;
+
+    cout << "Enter Roll Number to Update: ";
+    cin >> roll;
+
+    bool found = false;
+
+    for(int i = 0; i < students.size(); i++)
+    {
+        if(students[i].rollNo == roll)
+        {
+            found = true;
+
+            cout << "Enter New Name: ";
+            cin.ignore();
+            getline(cin, students[i].name);
+
+            cout << "Enter New Age: ";
+            cin >> students[i].age;
+
+            cout << "Enter New Course: ";
+            cin.ignore();
+            getline(cin, students[i].course);
+
+            cout << "Enter New Marks: ";
+            cin >> students[i].marks;
+
+            cout << "Student Updated Successfully!" << endl;
+
+            break;
+        }
+    }
+    if(!found)
+    {
+        cout << "Student Not Found!" << endl;
+    }
+}
 
 int main(){
     int choice;
@@ -123,10 +161,11 @@ int main(){
         cout << " SMART STUDENT MANAGEMENT SYSTEM" << endl;
         cout << "==================================" << endl;
         cout << "1. Add Student" << endl;
-        cout << "2. Display Students" << endl;
+        cout << "2. Display Student" << endl;
         cout << "3. Search Student" << endl;
-        cout << "4. Delete Student" << endl;
-        cout << "5. Exit" << endl;
+        cout << "4. Update Student" << endl;
+        cout << "5. Delete Student" << endl;
+        cout << "6. Exit" << endl;
         cout << "Enter your choice: ";
         cin >> choice;
 
@@ -137,18 +176,22 @@ int main(){
             break;
 
             case 2:
-            displayStudents();
+            displayStudent();
             break;
 
             case 3:
-            searchStudents();
+            searchStudent();
             break;
 
             case 4:
-            deleteStudent();
+            updateStudent();
             break;
 
             case 5:
+            deleteStudent();
+            break;
+
+            case 6:
             cout << "Thank you for using the Smart Student Management System!" << endl;
             return 0;
 
