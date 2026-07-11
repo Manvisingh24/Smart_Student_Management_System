@@ -83,9 +83,35 @@ void searchStudents(){
         }
     }
     if(!found)
-{
-    cout << "Student Not Found!" << endl;
+    {
+        cout << "Student Not Found!" << endl;
+    }
 }
+void deleteStudent(){
+    int roll;
+
+    cout << "Enter Roll Number to Delete: ";
+    cin >> roll;
+
+    bool found = false;
+
+    for(int i = 0; i < students.size(); i++)
+    {
+        if(students[i].rollNo == roll)
+        {
+            students.erase(students.begin() + i);
+
+            found = true;
+
+            cout << "Student Deleted Successfully!" << endl;
+
+            break;
+        }
+    }
+    if(!found)
+    {
+        cout << "Student Not Found!" << endl;
+    }
 }
 
 int main(){
@@ -99,7 +125,8 @@ int main(){
         cout << "1. Add Student" << endl;
         cout << "2. Display Students" << endl;
         cout << "3. Search Student" << endl;
-        cout << "4. Exit" << endl;
+        cout << "4. Delete Student" << endl;
+        cout << "5. Exit" << endl;
         cout << "Enter your choice: ";
         cin >> choice;
 
@@ -118,8 +145,12 @@ int main(){
             break;
 
             case 4:
-            cout << "Thank you for using the Smart Student Management System!" << endl;
+            deleteStudent();
             break;
+
+            case 5:
+            cout << "Thank you for using the Smart Student Management System!" << endl;
+            return 0;
 
             default:
             cout << "Invalid Choice!" << endl;
