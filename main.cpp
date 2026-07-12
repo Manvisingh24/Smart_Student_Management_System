@@ -1,8 +1,18 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <fstream>
 
 using namespace std;
+
+//Function prototypes
+void addStudent();
+void displayStudent();
+void searchStudent();
+void updateStudent();
+void deleteStudent();
+void saveToFile();
+void loadFromFile();
 
 class Student{
     public:
@@ -41,6 +51,8 @@ void addStudent()
     students.push_back(s);
 
     cout<<"\nStudent Added Successfully!\n";
+
+    saveToFile();
 }
 void displayStudent(){
     if(students.empty()){
@@ -105,6 +117,8 @@ void deleteStudent(){
 
             cout << "Student Deleted Successfully!" << endl;
 
+            saveToFile();
+
             break;
         }
     }
@@ -143,6 +157,8 @@ void updateStudent(){
 
             cout << "Student Updated Successfully!" << endl;
 
+            saveToFile();
+
             break;
         }
     }
@@ -151,9 +167,56 @@ void updateStudent(){
         cout << "Student Not Found!" << endl;
     }
 }
+void saveToFile(){
+
+    ofstream file("students.txt");
+
+    for(int i = 0; i < students.size(); i++)
+    {
+        file << students[i].rollNo << endl;
+        file << students[i].name << endl;
+        file << students[i].age << endl;
+        file << students[i].course << endl;
+        file << students[i].marks << endl;
+    }
+    file.close();
+
+}
+void loadFromFile(){
+
+    ifstream file("students.txt");
+
+    if(!file)
+    {
+        return;
+    }
+    Student s;
+
+    while(file >> s.rollNo)
+    {
+        file.ignore();
+
+        getline(file, s.name);
+
+        file >> s.age;
+
+        file.ignore();
+
+        getline(file, s.course);
+
+        file >> s.marks;
+
+        students.push_back(s);
+    }
+
+    file.close();
+}
+
 
 int main(){
     int choice;
+
+    loadFromFile();
 
     while(true)
     {
