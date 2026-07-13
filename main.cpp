@@ -13,6 +13,7 @@ void updateStudent();
 void deleteStudent();
 void saveToFile();
 void loadFromFile();
+void studentStatistics();
 
 class Student{
     public:
@@ -212,6 +213,43 @@ void loadFromFile(){
     file.close();
 }
 
+void studentStatistics(){
+
+    if(students.empty()){
+    cout << "No Students Available!" << endl;
+    return;
+    }
+    
+    int totalMarks = 0;
+    int highestMarks = students[0].marks;
+    int lowestMarks = students[0].marks;
+
+    for(int i = 0; i < students.size(); i++)
+    {
+       totalMarks += students[i].marks;
+       
+       if(students[i].marks > highestMarks)
+        {
+            highestMarks = students[i].marks;
+        }
+
+        if(students[i].marks < lowestMarks)
+        {
+            lowestMarks = students[i].marks;
+        }
+    }
+    double averageMarks = (double)totalMarks / students.size();
+
+    cout << "\n==================================" << endl;
+    cout << "      STUDENT STATISTICS" << endl;
+    cout << "==================================" << endl;
+
+    cout << "Total Students : " << students.size() << endl;
+    cout << "Average Marks  : " << averageMarks << endl;
+    cout << "Highest Marks  : " << highestMarks << endl;
+    cout << "Lowest Marks   : " << lowestMarks << endl;
+}
+
 
 int main(){
     int choice;
@@ -228,7 +266,8 @@ int main(){
         cout << "3. Search Student" << endl;
         cout << "4. Update Student" << endl;
         cout << "5. Delete Student" << endl;
-        cout << "6. Exit" << endl;
+        cout << "6. Student Statistics" << endl;
+        cout << "7. Exit" << endl;
         cout << "Enter your choice: ";
         cin >> choice;
 
@@ -255,6 +294,10 @@ int main(){
             break;
 
             case 6:
+            studentStatistics();
+            break;
+
+            case 7:
             cout << "Thank you for using the Smart Student Management System!" << endl;
             return 0;
 
