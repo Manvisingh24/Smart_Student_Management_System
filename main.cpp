@@ -14,6 +14,12 @@ void deleteStudent();
 void saveToFile();
 void loadFromFile();
 void studentStatistics();
+void showTopper();
+void sortStudents();
+
+void sortByRollNo();
+void sortByName();
+void sortByMarks();
 
 class Student{
     public:
@@ -275,6 +281,108 @@ void showTopper(){
     cout << "Course      : " << topper.course << endl;
     cout << "Marks       : " << topper.marks << endl;
 }
+void sortStudents(){
+
+    int choice;
+
+    cout << "\n==================================" << endl;
+    cout << "         SORT STUDENTS" << endl;
+    cout << "==================================" << endl;
+    cout << "1. Sort by Roll Number" << endl;
+    cout << "2. Sort by Name" << endl;
+    cout << "3. Sort by Marks" << endl;
+    cout << "4. Back to Main Menu" << endl;
+
+    cout << "Enter your choice: ";
+    cin >> choice;
+
+    switch(choice)
+    {
+        case 1:
+            sortByRollNo();
+            break;
+
+        case 2:
+            sortByName();
+            break;
+
+        case 3:
+            sortByMarks();
+            break;
+
+        case 4:
+            return;
+
+        default:
+            cout << "Invalid Choice!" << endl;
+    }
+}
+void sortByRollNo()
+{
+    cout << "sortByRollNo() called!" << endl;
+    if(students.empty())
+    {
+        cout << "No Students Available!" << endl;
+        return;
+    }
+    for(int i = 0; i < students.size() - 1; i++)
+    {
+        for(int j = 0; j < students.size() - i - 1; j++)
+        {
+            if(students[j].rollNo > students[j + 1].rollNo)
+            {
+                swap(students[j], students[j + 1]);
+            }
+        }
+    }
+    saveToFile();
+
+    cout << "Students sorted by Roll No. successfully!" << endl;
+}
+
+void sortByName()
+{
+    if(students.empty())
+    {
+        cout << "No Students Available!" << endl;
+        return;
+    }
+    for(int i = 0; i < students.size() - 1; i++)
+    {
+        for(int j = 0; j < students.size() - i - 1; j++)
+        {
+            if(students[j].name > students[j + 1].name)
+            {
+                swap(students[j], students[j + 1]);
+            }
+        }
+    }
+    saveToFile();
+
+    cout << "Students sorted by Name successfully!" << endl;
+}
+
+void sortByMarks()
+{
+    if(students.empty())
+    {
+        cout << "No Students Available!" << endl;
+        return;
+    }
+    for(int i = 0; i < students.size() - 1; i++)
+    {
+        for(int j = 0; j < students.size() - i - 1; j++)
+        {
+            if(students[j].marks > students[j+1].marks)
+            {
+                swap(students[j], students[j+1]);
+            }
+        }
+    }
+    saveToFile();
+
+    cout << "Students sorted by Marks successfully!" << endl;
+}
 
 int main(){
     int choice;
@@ -293,7 +401,8 @@ int main(){
         cout << "5. Delete Student" << endl;
         cout << "6. Student Statistics" << endl;
         cout << "7. Show Topper" << endl;
-        cout << "8. Exit" << endl;
+        cout << "8. Sort Students" << endl;
+        cout << "9. Exit" << endl;
         cout << "Enter your choice: ";
         cin >> choice;
 
@@ -328,6 +437,10 @@ int main(){
             break;
 
             case 8:
+            sortStudents();
+            break;
+
+            case 9:
             cout << "Thank you for using the Smart Student Management System!" << endl;
             return 0;
 
