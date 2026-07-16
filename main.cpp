@@ -249,7 +249,32 @@ void studentStatistics(){
     cout << "Highest Marks  : " << highestMarks << endl;
     cout << "Lowest Marks   : " << lowestMarks << endl;
 }
+void showTopper(){
+    if(students.empty())
+    {
+        cout << "No Students Available!" << endl;
+        return;
+    }
 
+    Student topper = students[0];
+
+    for(int i = 0; i < students.size(); i++)
+    {
+        if(students[i].marks > topper.marks)
+        {
+            topper = students[i];
+        }
+    }
+    cout << "\n==================================" << endl;
+    cout << "            TOPPER" << endl;
+    cout << "==================================" << endl;
+
+    cout << "Roll Number : " << topper.rollNo << endl;
+    cout << "Name        : " << topper.name << endl;
+    cout << "Age         : " << topper.age << endl;
+    cout << "Course      : " << topper.course << endl;
+    cout << "Marks       : " << topper.marks << endl;
+}
 
 int main(){
     int choice;
@@ -267,7 +292,8 @@ int main(){
         cout << "4. Update Student" << endl;
         cout << "5. Delete Student" << endl;
         cout << "6. Student Statistics" << endl;
-        cout << "7. Exit" << endl;
+        cout << "7. Show Topper" << endl;
+        cout << "8. Exit" << endl;
         cout << "Enter your choice: ";
         cin >> choice;
 
@@ -298,6 +324,10 @@ int main(){
             break;
 
             case 7:
+            showTopper();
+            break;
+
+            case 8:
             cout << "Thank you for using the Smart Student Management System!" << endl;
             return 0;
 
