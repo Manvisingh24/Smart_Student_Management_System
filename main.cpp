@@ -21,7 +21,7 @@ void sortByRollNo();
 void sortByName();
 void sortByMarks();
 
-class Student{
+struct Student{
     public:
         int rollNo;
         string name;
@@ -39,21 +39,42 @@ void addStudent()
     cout << "Enter Roll Number: ";
     cin >> s.rollNo;
 
+    for(int i = 0; i < students.size(); i++)
+    {
+        if(students[i].rollNo == s.rollNo)
+        {
+            cout << "Roll Number already exists!" << endl;
+            return;
+        }
+    }
+
     cin.ignore();
 
-    cout<<"Enter Name:";
+    cout<< "Enter Name: ";
     getline(cin, s.name);
 
-    cout<<"Enter Age:";
+    cout<< "Enter Age:" ;
     cin>>s.age;
+
+    if(s.age <= 0 || s.age > 120)
+    {
+        cout << "Invalid Age!" << endl;
+        return;
+    }
 
     cin.ignore();
 
-    cout<<"Enter Course:";
+    cout<< "Enter Course: ";
     getline(cin, s.course);
 
-    cout<<"Enter Marks:";
+    cout<< "Enter Marks: ";
     cin>>s.marks;
+
+    if(s.marks < 0 || s.marks > 100)
+    {
+        cout << "Invalid Marks! Marks should be between 0 and 100." << endl;
+        return;
+    }
 
     students.push_back(s);
 
@@ -80,7 +101,7 @@ void displayStudent(){
 void searchStudent(){
     int roll;
 
-    cout<<"Enter Roll Number to search:";
+    cout<< "Enter Roll Number to search: ";
     cin>>roll;
 
     bool found = false;
@@ -148,25 +169,48 @@ void updateStudent(){
         {
             found = true;
 
+            // Temporary variables
+            string newName;
+            int newAge;
+            string newCourse;
+            float newMarks;
+
             cout << "Enter New Name: ";
             cin.ignore();
-            getline(cin, students[i].name);
+            getline(cin, newName);
 
             cout << "Enter New Age: ";
-            cin >> students[i].age;
+            cin >> newAge;
+
+            if(newAge <= 0 || newAge > 120)
+            {
+                cout << "Invalid Age!" << endl;
+                return;
+            }
 
             cout << "Enter New Course: ";
             cin.ignore();
-            getline(cin, students[i].course);
+            getline(cin, newCourse);
 
             cout << "Enter New Marks: ";
-            cin >> students[i].marks;
+            cin >> newMarks;
+
+            if(newMarks < 0 || newMarks > 100)
+            {
+            cout << "Invalid Marks! Marks should be between 0 and 100." << endl;
+            return;
+            }
+
+            students[i].name = newName;
+            students[i].age = newAge;
+            students[i].course = newCourse;
+            students[i].marks = newMarks;
 
             cout << "Student Updated Successfully!" << endl;
 
             saveToFile();
 
-            break;
+            return;
         }
     }
     if(!found)
