@@ -383,6 +383,41 @@ void sortByMarks()
 
     cout << "Students sorted by Marks successfully!" << endl;
 }
+void exportReport(){
+    if(students.empty())
+    {
+        cout << "No Students Available!" << endl;
+        return;
+    }
+    ofstream file("student_report.txt");
+
+    if(!file)
+    {
+        cout << "Error creating report file!" << endl;
+        return;
+    }
+
+    file << "==================================" << endl;
+    file << "      STUDENT REPORT" << endl;
+    file << "==================================" << endl;
+    file << "Total Students : " << students.size() << endl;
+    file << endl;
+
+    for(int i = 0; i < students.size(); i++)
+    {
+        file << "----------------------------------" << endl;
+        file << "Roll Number : " << students[i].rollNo << endl;
+        file << "Name        : " << students[i].name << endl;
+        file << "Age         : " << students[i].age << endl;
+        file << "Course      : " << students[i].course << endl;
+        file << "Marks       : " << students[i].marks << endl;
+        file << endl;
+    }
+    file.close();
+
+    cout << "Student report exported successfully to student_report.txt!" << endl;
+}
+
 
 int main(){
     int choice;
@@ -402,7 +437,8 @@ int main(){
         cout << "6. Student Statistics" << endl;
         cout << "7. Show Topper" << endl;
         cout << "8. Sort Students" << endl;
-        cout << "9. Exit" << endl;
+        cout << "9. Export Report" << endl;
+        cout << "10. Exit" << endl;
         cout << "Enter your choice: ";
         cin >> choice;
 
@@ -441,6 +477,10 @@ int main(){
             break;
 
             case 9:
+            exportReport();
+            break;
+
+            case 10:
             cout << "Thank you for using the Smart Student Management System!" << endl;
             return 0;
 
