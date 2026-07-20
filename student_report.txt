@@ -4,11 +4,11 @@
 Total Students : 4
 
 ----------------------------------
-Roll Number : 4
-Name        : Gunjan
-Age         : 11
-Course      : M.Tech
-Marks       : 20
+Roll Number : 1
+Name        : Manvi
+Age         : 20
+Course      : B.Tech
+Marks       : 56
 
 ----------------------------------
 Roll Number : 2
@@ -18,16 +18,16 @@ Course      : BBA
 Marks       : 45
 
 ----------------------------------
-Roll Number : 1
-Name        : Manvi
-Age         : 20
-Course      : B.Tech
-Marks       : 56
+Roll Number : 3
+Name        : Shrishti
+Age         : 15
+Course      : B.Optom
+Marks       : 55
 
 ----------------------------------
-Roll Number : 3
-Name        : Muskan
-Age         : 21
-Course      : MBA
-Marks       : 78
+Roll Number : 4
+Name        : Gunjan
+Age         : 11
+Course      : M.Tech
+Marks       : 20
 
