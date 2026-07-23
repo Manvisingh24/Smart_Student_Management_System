@@ -84,67 +84,57 @@ void searchStudent()
     }
 }
 
-void updateStudent(){
+void updateStudent()
+{
     int roll;
 
     cout << "Enter Roll Number to Update: ";
     cin >> roll;
 
-    bool found = false;
-
-    for(int i = 0; i < students.size(); i++)
-    {
-        if(students[i].rollNo == roll)
-        {
-            found = true;
-
-            // Temporary variables
-            string newName;
-            int newAge;
-            string newCourse;
-            float newMarks;
-
-            cout << "Enter New Name: ";
-            cin.ignore();
-            getline(cin, newName);
-
-            cout << "Enter New Age: ";
-            cin >> newAge;
-
-            if(newAge <= 0 || newAge > 120)
-            {
-                cout << "Invalid Age!" << endl;
-                return;
-            }
-
-            cout << "Enter New Course: ";
-            cin.ignore();
-            getline(cin, newCourse);
-
-            cout << "Enter New Marks: ";
-            cin >> newMarks;
-
-            if(newMarks < 0 || newMarks > 100)
-            {
-            cout << "Invalid Marks! Marks should be between 0 and 100." << endl;
-            return;
-            }
-
-            students[i].name = newName;
-            students[i].age = newAge;
-            students[i].course = newCourse;
-            students[i].marks = newMarks;
-
-            cout << "Student Updated Successfully!" << endl;
-
-            saveToFile();
-
-            return;
-        }
-    }
-    if(!found)
+    if(!searchStudentInDatabase(roll))
     {
         cout << "Student Not Found!" << endl;
+        return;
+    }
+
+    string newName;
+    int newAge;
+    string newCourse;
+    float newMarks;
+
+    cout << "\nEnter New Name: ";
+    cin.ignore();
+    getline(cin, newName);
+
+    cout << "Enter New Age: ";
+    cin >> newAge;
+
+    if(newAge <= 0 || newAge > 120)
+    {
+        cout << "Invalid Age!" << endl;
+        return;
+    }
+
+    cout << "Enter New Course: ";
+    cin.ignore();
+    getline(cin, newCourse);
+
+    cout << "Enter New Marks: ";
+    cin >> newMarks;
+
+    if(newMarks < 0 || newMarks > 100)
+    {
+        cout << "Invalid Marks! Marks should be between 0 and 100." << endl;
+        return;
+    }
+
+    if(updateStudentInDatabase(roll, newName, newAge, newCourse, newMarks))
+    {
+        cout << "Student Updated Successfully!" << endl;
+    }
+    else
+    {
+        cout << "Failed to update student!" << endl;
     }
 }
 

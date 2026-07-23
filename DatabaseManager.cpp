@@ -253,4 +253,65 @@ bool searchStudentInDatabase(int roll)
     sqlite3_close(DB);
 
     return false;
-}  
+}
+
+bool updateStudentInDatabase(int roll, const string& newName, int newAge,
+                             const string& newCourse, float newMarks)
+{
+    sqlite3* DB;
+
+    int exit = sqlite3_open("students.db", &DB);
+
+    if(exit != SQLITE_OK)
+    {
+        cout << "Error opening database!" << endl;
+        return false;
+    }
+
+    const char* sql =
+        "UPDATE students "
+        "SET name = ?, age = ?, course = ?, marks = ? "
+        "WHERE rollNo = ?;";
+
+    sqlite3_stmt* stmt;
+
+    exit = sqlite3_prepare_v2(DB, sql, -1, &stmt, NULL);
+
+    if(exit != SQLITE_OK)
+    {
+        cout << "Error preparing update query!" << endl;
+        sqlite3_close(DB);
+        return false;
+    }
+
+    sqlite3_bind_text(stmt, 1, newName.c_str(), -1, SQLITE_TRANSIENT);
+    sqlite3_bind_int(stmt, 2, newAge);
+    sqlite3_bind_text(stmt, 3, newCourse.c_str(), -1, SQLITE_TRANSIENT);
+    sqlite3_bind_double(stmt, 4, newMarks);
+    sqlite3_bind_int(stmt, 5, roll);
+
+    exit = sqlite3_step(stmt);
+
+    if(exit != SQLITE_DONE)
+    {
+        cout << "Error updating student!" << endl;
+
+        sqlite3_finalize(stmt);
+        sqlite3_close(DB);
+
+        return false;
+    }
+
+    if(sqlite3_changes(DB) == 0)
+    {
+        sqlite3_finalize(stmt);
+        sqlite3_close(DB);
+
+        return false;
+    }
+
+    sqlite3_finalize(stmt);
+    sqlite3_close(DB);
+
+    return true;
+}
