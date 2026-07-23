@@ -315,3 +315,57 @@ bool updateStudentInDatabase(int roll, const string& newName, int newAge,
 
     return true;
 }
+
+bool deleteStudentFromDatabase(int roll)
+{
+    sqlite3* DB;
+
+    int exit = sqlite3_open("students.db", &DB);
+
+    if(exit != SQLITE_OK)
+    {
+        cout << "Error opening database!" << endl;
+        return false;
+    }
+
+    const char* sql =
+        "DELETE FROM students WHERE rollNo = ?;";
+
+    sqlite3_stmt* stmt;
+
+    exit = sqlite3_prepare_v2(DB, sql, -1, &stmt, NULL);
+
+    if(exit != SQLITE_OK)
+    {
+        cout << "Error preparing delete query!" << endl;
+        sqlite3_close(DB);
+        return false;
+    }
+
+    sqlite3_bind_int(stmt, 1, roll);
+
+    exit = sqlite3_step(stmt);
+
+    if(exit != SQLITE_DONE)
+    {
+        cout << "Error deleting student!" << endl;
+
+        sqlite3_finalize(stmt);
+        sqlite3_close(DB);
+
+        return false;
+    }
+
+    if(sqlite3_changes(DB) == 0)
+    {
+        sqlite3_finalize(stmt);
+        sqlite3_close(DB);
+
+        return false;
+    }
+
+    sqlite3_finalize(stmt);
+    sqlite3_close(DB);
+
+    return true;
+}
