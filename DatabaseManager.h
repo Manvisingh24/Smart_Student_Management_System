@@ -15,5 +15,8 @@ bool deleteStudentFromDatabase(int roll);
 
 void studentStatisticsFromDatabase();
 void showTopperFromDatabase();
+void sortStudentsByRollNoFromDatabase();
+void sortStudentsByNameFromDatabase();
+void sortStudentsByMarksFromDatabase();
 
 #endif

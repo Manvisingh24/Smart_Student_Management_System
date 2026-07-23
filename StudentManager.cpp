@@ -165,8 +165,8 @@ void showTopper()
     showTopperFromDatabase();
 }
 
-void sortStudents(){
-
+void sortStudents()
+{
     int choice;
 
     cout << "\n==================================" << endl;
@@ -183,15 +183,15 @@ void sortStudents(){
     switch(choice)
     {
         case 1:
-            sortByRollNo();
+            sortStudentsByRollNoFromDatabase();
             break;
 
         case 2:
-            sortByName();
+            sortStudentsByNameFromDatabase();
             break;
 
         case 3:
-            sortByMarks();
+            sortStudentsByMarksFromDatabase();
             break;
 
         case 4:
@@ -200,73 +200,6 @@ void sortStudents(){
         default:
             cout << "Invalid Choice!" << endl;
     }
-}
-
-void sortByRollNo()
-{
-    cout << "sortByRollNo() called!" << endl;
-    if(students.empty())
-    {
-        cout << "No Students Available!" << endl;
-        return;
-    }
-    for(int i = 0; i < students.size() - 1; i++)
-    {
-        for(int j = 0; j < students.size() - i - 1; j++)
-        {
-            if(students[j].rollNo > students[j + 1].rollNo)
-            {
-                swap(students[j], students[j + 1]);
-            }
-        }
-    }
-    saveToFile();
-
-    cout << "Students sorted by Roll No. successfully!" << endl;
-}
-
-void sortByName()
-{
-    if(students.empty())
-    {
-        cout << "No Students Available!" << endl;
-        return;
-    }
-    for(int i = 0; i < students.size() - 1; i++)
-    {
-        for(int j = 0; j < students.size() - i - 1; j++)
-        {
-            if(students[j].name > students[j + 1].name)
-            {
-                swap(students[j], students[j + 1]);
-            }
-        }
-    }
-    saveToFile();
-
-    cout << "Students sorted by Name successfully!" << endl;
-}
-
-void sortByMarks()
-{
-    if(students.empty())
-    {
-        cout << "No Students Available!" << endl;
-        return;
-    }
-    for(int i = 0; i < students.size() - 1; i++)
-    {
-        for(int j = 0; j < students.size() - i - 1; j++)
-        {
-            if(students[j].marks > students[j+1].marks)
-            {
-                swap(students[j], students[j+1]);
-            }
-        }
-    }
-    saveToFile();
-
-    cout << "Students sorted by Marks successfully!" << endl;
 }
 
 void exportReport(){

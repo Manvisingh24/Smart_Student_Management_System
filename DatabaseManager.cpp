@@ -503,3 +503,196 @@ void showTopperFromDatabase()
     sqlite3_finalize(stmt);
     sqlite3_close(DB);
 }
+
+void sortStudentsByRollNoFromDatabase()
+{
+    sqlite3* DB;
+
+    int exit = sqlite3_open("students.db", &DB);
+
+    if(exit != SQLITE_OK)
+    {
+        cout << "Error opening database!" << endl;
+        return;
+    }
+
+    const char* sql =
+        "SELECT rollNo, name, age, course, marks "
+        "FROM students "
+        "ORDER BY rollNo ASC;";
+
+    sqlite3_stmt* stmt;
+
+    exit = sqlite3_prepare_v2(DB, sql, -1, &stmt, NULL);
+
+    if(exit != SQLITE_OK)
+    {
+        cout << "Error preparing sort query!" << endl;
+        sqlite3_close(DB);
+        return;
+    }
+
+    bool found = false;
+
+    while(sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        found = true;
+
+        cout << "Roll Number : "
+             << sqlite3_column_int(stmt, 0) << endl;
+
+        cout << "Name : "
+             << sqlite3_column_text(stmt, 1) << endl;
+
+        cout << "Age : "
+             << sqlite3_column_int(stmt, 2) << endl;
+
+        cout << "Course : "
+             << sqlite3_column_text(stmt, 3) << endl;
+
+        cout << "Marks : "
+             << sqlite3_column_double(stmt, 4) << endl;
+
+        cout << "---------------------------" << endl;
+    }
+
+    if(!found)
+    {
+        cout << "No Students Available!" << endl;
+    }
+    else
+    {
+        cout << "Students sorted by Roll No. successfully!" << endl;
+    }
+
+    sqlite3_finalize(stmt);
+    sqlite3_close(DB);
+}
+void sortStudentsByNameFromDatabase()
+{
+    sqlite3* DB;
+
+    int exit = sqlite3_open("students.db", &DB);
+
+    if(exit != SQLITE_OK)
+    {
+        cout << "Error opening database!" << endl;
+        return;
+    }
+
+    const char* sql =
+        "SELECT rollNo, name, age, course, marks "
+        "FROM students "
+        "ORDER BY name ASC;";
+
+    sqlite3_stmt* stmt;
+
+    exit = sqlite3_prepare_v2(DB, sql, -1, &stmt, NULL);
+
+    if(exit != SQLITE_OK)
+    {
+        cout << "Error preparing sort query!" << endl;
+        sqlite3_close(DB);
+        return;
+    }
+
+    bool found = false;
+
+    while(sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        found = true;
+
+        cout << "Roll Number : "
+             << sqlite3_column_int(stmt, 0) << endl;
+
+        cout << "Name : "
+             << sqlite3_column_text(stmt, 1) << endl;
+
+        cout << "Age : "
+             << sqlite3_column_int(stmt, 2) << endl;
+
+        cout << "Course : "
+             << sqlite3_column_text(stmt, 3) << endl;
+
+        cout << "Marks : "
+             << sqlite3_column_double(stmt, 4) << endl;
+
+        cout << "---------------------------" << endl;
+    }
+
+    if(!found)
+    {
+        cout << "No Students Available!" << endl;
+    }
+    else
+    {
+        cout << "Students sorted by Name successfully!" << endl;
+    }
+
+    sqlite3_finalize(stmt);
+    sqlite3_close(DB);
+}
+void sortStudentsByMarksFromDatabase()
+{
+    sqlite3* DB;
+
+    int exit = sqlite3_open("students.db", &DB);
+
+    if(exit != SQLITE_OK)
+    {
+        cout << "Error opening database!" << endl;
+        return;
+    }
+
+    const char* sql =
+        "SELECT rollNo, name, age, course, marks "
+        "FROM students "
+        "ORDER BY marks ASC;";
+
+    sqlite3_stmt* stmt;
+
+    exit = sqlite3_prepare_v2(DB, sql, -1, &stmt, NULL);
+
+    if(exit != SQLITE_OK)
+    {
+        cout << "Error preparing sort query!" << endl;
+        sqlite3_close(DB);
+        return;
+    }
+
+    bool found = false;
+
+    while(sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        found = true;
+
+        cout << "Roll Number : "
+             << sqlite3_column_int(stmt, 0) << endl;
+
+        cout << "Name : "
+             << sqlite3_column_text(stmt, 1) << endl;
+
+        cout << "Age : "
+             << sqlite3_column_int(stmt, 2) << endl;
+
+        cout << "Course : "
+             << sqlite3_column_text(stmt, 3) << endl;
+
+        cout << "Marks : "
+             << sqlite3_column_double(stmt, 4) << endl;
+
+        cout << "---------------------------" << endl;
+    }
+
+    if(!found)
+    {
+        cout << "No Students Available!" << endl;
+    }
+    else
+    {
+        cout << "Students sorted by Marks successfully!" << endl;
+    }
+
+    sqlite3_finalize(stmt);
+    sqlite3_close(DB);
+}
