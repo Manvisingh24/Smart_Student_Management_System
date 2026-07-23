@@ -1,7 +1,6 @@
 ==================================
       STUDENT REPORT
 ==================================
-Total Students : 4
 
 ----------------------------------
 Roll Number : 1
@@ -12,10 +11,10 @@ Marks       : 56
 
 ----------------------------------
 Roll Number : 2
-Name        : Kajal
-Age         : 21
-Course      : BBA
-Marks       : 45
+Name        : Muskan Jain
+Age         : 22
+Course      : CSE
+Marks       : 67
 
 ----------------------------------
 Roll Number : 3
@@ -31,3 +30,5 @@ Age         : 11
 Course      : M.Tech
 Marks       : 20
 
+==================================
+Total Students : 4

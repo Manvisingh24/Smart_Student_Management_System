@@ -18,5 +18,6 @@ void showTopperFromDatabase();
 void sortStudentsByRollNoFromDatabase();
 void sortStudentsByNameFromDatabase();
 void sortStudentsByMarksFromDatabase();
+void exportReportFromDatabase();
 
 #endif

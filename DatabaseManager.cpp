@@ -696,3 +696,100 @@ void sortStudentsByMarksFromDatabase()
     sqlite3_finalize(stmt);
     sqlite3_close(DB);
 }
+
+void exportReportFromDatabase()
+{
+    sqlite3* DB;
+
+    int exit = sqlite3_open("students.db", &DB);
+
+    if(exit != SQLITE_OK)
+    {
+        cout << "Error opening database!" << endl;
+        return;
+    }
+
+    const char* sql =
+        "SELECT rollNo, name, age, course, marks "
+        "FROM students "
+        "ORDER BY rollNo ASC;";
+
+    sqlite3_stmt* stmt;
+
+    exit = sqlite3_prepare_v2(DB, sql, -1, &stmt, NULL);
+
+    if(exit != SQLITE_OK)
+    {
+        cout << "Error preparing report query!" << endl;
+        sqlite3_close(DB);
+        return;
+    }
+
+    ofstream file("student_report.txt");
+
+    if(!file)
+    {
+        cout << "Error creating report file!" << endl;
+
+        sqlite3_finalize(stmt);
+        sqlite3_close(DB);
+
+        return;
+    }
+
+    int totalStudents = 0;
+
+    file << "==================================" << endl;
+    file << "      STUDENT REPORT" << endl;
+    file << "==================================" << endl;
+
+    while(sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        if(totalStudents == 0)
+        {
+            file << endl;
+        }
+
+        totalStudents++;
+
+        file << "----------------------------------" << endl;
+
+        file << "Roll Number : "
+             << sqlite3_column_int(stmt, 0) << endl;
+
+        file << "Name        : "
+             << sqlite3_column_text(stmt, 1) << endl;
+
+        file << "Age         : "
+             << sqlite3_column_int(stmt, 2) << endl;
+
+        file << "Course      : "
+             << sqlite3_column_text(stmt, 3) << endl;
+
+        file << "Marks       : "
+             << sqlite3_column_double(stmt, 4) << endl;
+
+        file << endl;
+    }
+
+    if(totalStudents == 0)
+    {
+        cout << "No Students Available!" << endl;
+
+        file.close();
+        sqlite3_finalize(stmt);
+        sqlite3_close(DB);
+
+        return;
+    }
+
+    file << "==================================" << endl;
+    file << "Total Students : " << totalStudents << endl;
+
+    file.close();
+
+    sqlite3_finalize(stmt);
+    sqlite3_close(DB);
+
+    cout << "Student report exported successfully to student_report.txt!" << endl;
+}

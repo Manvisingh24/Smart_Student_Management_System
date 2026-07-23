@@ -202,37 +202,7 @@ void sortStudents()
     }
 }
 
-void exportReport(){
-    if(students.empty())
-    {
-        cout << "No Students Available!" << endl;
-        return;
-    }
-    ofstream file("student_report.txt");
-
-    if(!file)
-    {
-        cout << "Error creating report file!" << endl;
-        return;
-    }
-
-    file << "==================================" << endl;
-    file << "      STUDENT REPORT" << endl;
-    file << "==================================" << endl;
-    file << "Total Students : " << students.size() << endl;
-    file << endl;
-
-    for(int i = 0; i < students.size(); i++)
-    {
-        file << "----------------------------------" << endl;
-        file << "Roll Number : " << students[i].rollNo << endl;
-        file << "Name        : " << students[i].name << endl;
-        file << "Age         : " << students[i].age << endl;
-        file << "Course      : " << students[i].course << endl;
-        file << "Marks       : " << students[i].marks << endl;
-        file << endl;
-    }
-    file.close();
-
-    cout << "Student report exported successfully to student_report.txt!" << endl;
+void exportReport()
+{
+    exportReportFromDatabase();
 }
