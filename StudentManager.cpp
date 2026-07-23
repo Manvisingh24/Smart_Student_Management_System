@@ -1,6 +1,7 @@
-#include "studentmanager.h"
-#include "student.h"
-#include "filemanager.h"
+#include "StudentManager.h"
+#include "Student.h"
+#include "FileManager.h"
+#include "DatabaseManager.h"
 
 #include <iostream>
 #include <vector>
@@ -56,28 +57,16 @@ void addStudent()
         return;
     }
 
-    students.push_back(s);
-
-    cout<<"\nStudent Added Successfully!\n";
-
-    saveToFile();
+    if(addStudentToDatabase(s))
+    {
+        students.push_back(s);
+        cout << "\nStudent Added Successfully!\n";
+    }
 }
 
-void displayStudent(){
-    if(students.empty()){
-        cout<<"No Stdudents found!"<<endl;
-        return;
-    }
-    cout<<"\n=====STUDENTS LIST=====\n";
-
-    for(int i=0; i<students.size(); i++){
-        cout<<"\nRoll Number :"<< students[i].rollNo << endl;
-        cout<<"Name :"<< students[i].name << endl;
-        cout<<"Age :"<< students[i].age << endl;
-        cout<<"Course :"<< students[i].course << endl;
-        cout<<"Marks :"<< students[i].marks << endl;
-        cout<<"---------------------------"<<endl;
-    }
+void displayStudent()
+{
+    displayStudentsFromDatabase();
 }
 
 void searchStudent(){
