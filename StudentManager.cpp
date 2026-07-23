@@ -160,31 +160,9 @@ void studentStatistics()
     studentStatisticsFromDatabase();
 }
 
-void showTopper(){
-    if(students.empty())
-    {
-        cout << "No Students Available!" << endl;
-        return;
-    }
-
-    Student topper = students[0];
-
-    for(int i = 0; i < students.size(); i++)
-    {
-        if(students[i].marks > topper.marks)
-        {
-            topper = students[i];
-        }
-    }
-    cout << "\n==================================" << endl;
-    cout << "            TOPPER" << endl;
-    cout << "==================================" << endl;
-
-    cout << "Roll Number : " << topper.rollNo << endl;
-    cout << "Name        : " << topper.name << endl;
-    cout << "Age         : " << topper.age << endl;
-    cout << "Course      : " << topper.course << endl;
-    cout << "Marks       : " << topper.marks << endl;
+void showTopper()
+{
+    showTopperFromDatabase();
 }
 
 void sortStudents(){
