@@ -7,5 +7,6 @@ bool initializeDatabase();
 bool addStudentToDatabase(const Student& s);
 void migrateStudentsFromFile();
 void displayStudentsFromDatabase();
+bool searchStudentInDatabase(int roll);
 
 #endif

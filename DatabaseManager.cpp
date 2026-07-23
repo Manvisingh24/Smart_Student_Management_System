@@ -194,3 +194,63 @@ void displayStudentsFromDatabase()
     sqlite3_finalize(stmt);
     sqlite3_close(DB);
 }
+
+bool searchStudentInDatabase(int roll)
+{
+    sqlite3* DB;
+
+    int exit = sqlite3_open("students.db", &DB);
+
+    if(exit != SQLITE_OK)
+    {
+        cout << "Error opening database!" << endl;
+        return false;
+    }
+
+    const char* sql =
+        "SELECT rollNo, name, age, course, marks "
+        "FROM students WHERE rollNo = ?;";
+
+    sqlite3_stmt* stmt;
+
+    exit = sqlite3_prepare_v2(DB, sql, -1, &stmt, NULL);
+
+    if(exit != SQLITE_OK)
+    {
+        cout << "Error searching student!" << endl;
+        sqlite3_close(DB);
+        return false;
+    }
+
+    sqlite3_bind_int(stmt, 1, roll);
+
+    if(sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        cout << "\nStudent Found!" << endl;
+
+        cout << "Roll Number : "
+             << sqlite3_column_int(stmt, 0) << endl;
+
+        cout << "Name : "
+             << sqlite3_column_text(stmt, 1) << endl;
+
+        cout << "Age : "
+             << sqlite3_column_int(stmt, 2) << endl;
+
+        cout << "Course : "
+             << sqlite3_column_text(stmt, 3) << endl;
+
+        cout << "Marks : "
+             << sqlite3_column_double(stmt, 4) << endl;
+
+        sqlite3_finalize(stmt);
+        sqlite3_close(DB);
+
+        return true;
+    }
+
+    sqlite3_finalize(stmt);
+    sqlite3_close(DB);
+
+    return false;
+}  

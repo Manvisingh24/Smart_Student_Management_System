@@ -69,30 +69,15 @@ void displayStudent()
     displayStudentsFromDatabase();
 }
 
-void searchStudent(){
+void searchStudent()
+{
     int roll;
 
-    cout<< "Enter Roll Number to search: ";
-    cin>>roll;
+    cout << "Enter Roll Number to search: ";
+    cin >> roll;
 
-    bool found = false;
+    bool found = searchStudentInDatabase(roll);
 
-    for(int i=0; i<students.size(); i++){
-
-        if(students[i].rollNo == roll)
-        {
-            found = true;
-
-        cout << "\nStudent Found!" << endl;
-         cout << "Roll Number : " << students[i].rollNo << endl;
-        cout << "Name : " << students[i].name << endl;
-        cout << "Age : " << students[i].age << endl;
-        cout << "Course : " << students[i].course << endl;
-        cout << "Marks : " << students[i].marks << endl;
-
-        break;
-        }
-    }
     if(!found)
     {
         cout << "Student Not Found!" << endl;
