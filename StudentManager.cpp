@@ -155,41 +155,9 @@ void deleteStudent()
     }
 }
 
-void studentStatistics(){
-
-    if(students.empty()){
-    cout << "No Students Available!" << endl;
-    return;
-    }
-    
-    int totalMarks = 0;
-    int highestMarks = students[0].marks;
-    int lowestMarks = students[0].marks;
-
-    for(int i = 0; i < students.size(); i++)
-    {
-       totalMarks += students[i].marks;
-       
-       if(students[i].marks > highestMarks)
-        {
-            highestMarks = students[i].marks;
-        }
-
-        if(students[i].marks < lowestMarks)
-        {
-            lowestMarks = students[i].marks;
-        }
-    }
-    double averageMarks = (double)totalMarks / students.size();
-
-    cout << "\n==================================" << endl;
-    cout << "      STUDENT STATISTICS" << endl;
-    cout << "==================================" << endl;
-
-    cout << "Total Students : " << students.size() << endl;
-    cout << "Average Marks  : " << averageMarks << endl;
-    cout << "Highest Marks  : " << highestMarks << endl;
-    cout << "Lowest Marks   : " << lowestMarks << endl;
+void studentStatistics()
+{
+    studentStatisticsFromDatabase();
 }
 
 void showTopper(){

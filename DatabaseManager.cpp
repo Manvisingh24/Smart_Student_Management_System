@@ -369,3 +369,78 @@ bool deleteStudentFromDatabase(int roll)
 
     return true;
 }
+
+void studentStatisticsFromDatabase()
+{
+    sqlite3* DB;
+
+    int exit = sqlite3_open("students.db", &DB);
+
+    if(exit != SQLITE_OK)
+    {
+        cout << "Error opening database!" << endl;
+        return;
+    }
+
+    const char* sql =
+        "SELECT COUNT(*), "
+        "AVG(marks), "
+        "MAX(marks), "
+        "MIN(marks) "
+        "FROM students;";
+
+    sqlite3_stmt* stmt;
+
+    exit = sqlite3_prepare_v2(DB, sql, -1, &stmt, NULL);
+
+    if(exit != SQLITE_OK)
+    {
+        cout << "Error preparing statistics query!" << endl;
+        sqlite3_close(DB);
+        return;
+    }
+
+    if(sqlite3_step(stmt) == SQLITE_ROW)
+    {
+        int totalStudents =
+            sqlite3_column_int(stmt, 0);
+
+        if(totalStudents == 0)
+        {
+            cout << "No Students Available!" << endl;
+
+            sqlite3_finalize(stmt);
+            sqlite3_close(DB);
+
+            return;
+        }
+
+        double averageMarks =
+            sqlite3_column_double(stmt, 1);
+
+        double highestMarks =
+            sqlite3_column_double(stmt, 2);
+
+        double lowestMarks =
+            sqlite3_column_double(stmt, 3);
+
+        cout << "\n==================================" << endl;
+        cout << "      STUDENT STATISTICS" << endl;
+        cout << "==================================" << endl;
+
+        cout << "Total Students : "
+             << totalStudents << endl;
+
+        cout << "Average Marks  : "
+             << averageMarks << endl;
+
+        cout << "Highest Marks  : "
+             << highestMarks << endl;
+
+        cout << "Lowest Marks   : "
+             << lowestMarks << endl;
+    }
+
+    sqlite3_finalize(stmt);
+    sqlite3_close(DB);
+}
