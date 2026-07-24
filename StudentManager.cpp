@@ -1,17 +1,11 @@
 #include "StudentManager.h"
 #include "Student.h"
-#include "FileManager.h"
 #include "DatabaseManager.h"
 
 #include <iostream>
-#include <vector>
 #include <string>
 
-#include <fstream>
-
 using namespace std;
-
-extern vector<Student> students;
 
 void addStudent()
 {
@@ -20,14 +14,6 @@ void addStudent()
     cout << "Enter Roll Number: ";
     cin >> s.rollNo;
 
-    for(int i = 0; i < students.size(); i++)
-    {
-        if(students[i].rollNo == s.rollNo)
-        {
-            cout << "Roll Number already exists!" << endl;
-            return;
-        }
-    }
 
     cin.ignore();
 
@@ -59,8 +45,11 @@ void addStudent()
 
     if(addStudentToDatabase(s))
     {
-        students.push_back(s);
         cout << "\nStudent Added Successfully!\n";
+    }
+    else
+    {
+        cout << "Roll Number already exists or student could not be added!" << endl;
     }
 }
 

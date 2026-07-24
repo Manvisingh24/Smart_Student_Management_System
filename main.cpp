@@ -1,14 +1,10 @@
 #include <iostream>
 #include <vector>
 
-#include "Student.h"
-#include "FileManager.h"
 #include "StudentManager.h"
 #include "DatabaseManager.h"
 
 using namespace std;
-
-vector<Student> students;
 
 
 int main(){

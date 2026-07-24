@@ -98,41 +98,6 @@ bool addStudentToDatabase(const Student& s)
     return true;
 }
 
-void migrateStudentsFromFile()
-{
-    ifstream file("students.txt");
-
-    if(!file)
-    {
-        cout << "students.txt not found!" << endl;
-        return;
-    }
-
-    Student s;
-
-    while(file >> s.rollNo)
-    {
-        file.ignore();
-
-        getline(file, s.name);
-
-        file >> s.age;
-        file.ignore();
-
-        getline(file, s.course);
-
-        file >> s.marks;
-
-        if(addStudentToDatabase(s))
-        {
-            cout << "Migrated student: " << s.name << endl;
-        }
-    }
-
-    file.close();
-
-    cout << "Migration completed successfully!" << endl;
-}
 
 void displayStudentsFromDatabase()
 {
