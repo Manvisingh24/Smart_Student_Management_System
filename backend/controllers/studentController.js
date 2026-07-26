@@ -8,11 +8,15 @@ const getAllStudents = (req, res) => {
             console.error("Error fetching students:", err.message);
 
             return res.status(500).json({
-                error: "Failed to fetch students"
+                success: false,
+                message: "Failed to fetch students"
             });
         }
 
-        res.json(rows);
+        res.json({
+            success: true,
+            data: rows
+        });
     });
 };
 
@@ -25,25 +29,29 @@ const createStudent = (req, res) => {
 
     if (!rollNo || !name || !age || !course || marks === undefined) {
         return res.status(400).json({
-            error: "All student fields are required"
+            success: false,
+            message: "All student fields are required"
         });
     }
 
     if (rollNo <= 0) {
         return res.status(400).json({
-            error: "Roll number must be positive"
+            success: false,
+            message: "Roll number must be positive"
         });
     }
 
     if (age <= 0) {
         return res.status(400).json({
-            error: "Age must be positive"
+            success: false,
+            message: "Age must be positive"
         });
     }
 
     if (marks < 0 || marks > 100) {
         return res.status(400).json({
-            error: "Marks must be between 0 and 100"
+            success: false,
+            message: "Marks must be between 0 and 100"
         });
     }
 
@@ -61,18 +69,23 @@ const createStudent = (req, res) => {
                 err.message.includes("PRIMARY KEY constraint failed")
             ) {
                 return res.status(409).json({
-                    error: `Student with roll number ${rollNo} already exists`
+                    success: false,
+                    message: `Student with roll number ${rollNo} already exists`
                 });
             }
 
             return res.status(500).json({
-                error: "Failed to add student"
+                success: false,
+                message: "Failed to add student"
             });
         }
 
         res.status(201).json({
+            success: true,
             message: "Student added successfully!",
-            studentId: this.lastID
+             data: {
+                studentId: this.lastID
+            }
         });
     });
 };
@@ -87,17 +100,22 @@ const getStudentByRollNo = (req, res) => {
             console.error("Error searching student:", err.message);
 
             return res.status(500).json({
-                error: "Failed to search student"
+                success: false,
+                message: "Failed to search student"
             });
         }
 
         if (!row) {
             return res.status(404).json({
+                success: false,
                 message: "Student not found"
             });
         }
 
-        res.json(row);
+        res.json({
+            success: true,
+            data: row
+        });
     });
 };
 
@@ -108,19 +126,22 @@ const updateStudent = (req, res) => {
 
     if (!name || !age || !course || marks === undefined) {
         return res.status(400).json({
-            error: "All student fields are required"
+            success: false,
+            message: "All student fields are required"
         });
     }
 
     if (age <= 0) {
         return res.status(400).json({
-            error: "Age must be positive"
+            success: false,
+            message: "Age must be positive"
         });
     }
 
     if (marks < 0 || marks > 100) {
         return res.status(400).json({
-            error: "Marks must be between 0 and 100"
+            success: false,
+            message: "Marks must be between 0 and 100"
         });
     }
 
@@ -135,17 +156,20 @@ const updateStudent = (req, res) => {
             console.error("Error updating student:", err.message);
 
             return res.status(500).json({
-                error: "Failed to update student"
+                success: false,
+                message: "Failed to update student"
             });
         }
 
         if (this.changes === 0) {
             return res.status(404).json({
+                success: false,
                 message: "Student not found"
             });
         }
 
         res.json({
+            success: true,
             message: "Student updated successfully!"
         });
     });
@@ -162,17 +186,20 @@ const deleteStudent = (req, res) => {
             console.error("Error deleting student:", err.message);
 
             return res.status(500).json({
-                error: "Failed to delete student"
+                success: false,
+                message: "Failed to delete student"
             });
         }
 
         if (this.changes === 0) {
             return res.status(404).json({
+                success: false,
                 message: "Student not found"
             });
         }
 
         res.json({
+            success: true,
             message: "Student deleted successfully!"
         });
     });
