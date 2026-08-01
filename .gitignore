@@ -1,3 +1,6 @@
 *.exe
 student_report.txt
 *.o
+
+node_modules/
+backend/.env

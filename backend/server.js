@@ -1,3 +1,6 @@
+require("dotenv").config();
+console.log("JWT_SECRET:", process.env.JWT_SECRET);
+
 const express = require("express");
 const studentRoutes = require("./routes/studentRoutes");
 const authRoutes = require("./routes/authRoutes");
