@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 
+const authMiddleware = require("../middleware/authMiddleware");
+
 const {
     getAllStudents,
     createStudent,
@@ -11,7 +13,7 @@ const {
 
 
 // GET all students
-router.get("/", getAllStudents);
+router.get("/", authMiddleware, getAllStudents);
 
 // POST a new student
 router.post("/", createStudent);

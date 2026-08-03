@@ -1,6 +1,9 @@
 const db = require("../database/db");
 
 const getAllStudents = (req, res) => {
+
+    console.log("Logged in user:", req.user);
+    
     const sql = "SELECT * FROM students";
 
     db.all(sql, [], (err, rows) => {
