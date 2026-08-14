@@ -4,9 +4,16 @@ function Students() {
   const [students, setStudents] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:3000/api/students")
+    const token = localStorage.getItem("token");
+
+    fetch("http://localhost:3000/api/students", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
       .then((response) => response.json())
       .then((data) => {
+        console.log(data);
         setStudents(data.data);
       })
       .catch((error) => {

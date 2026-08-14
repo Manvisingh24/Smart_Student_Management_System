@@ -2,11 +2,13 @@ require("dotenv").config();
 console.log("JWT_SECRET:", process.env.JWT_SECRET);
 
 const express = require("express");
+const cors = require("cors");
 const studentRoutes = require("./routes/studentRoutes");
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");  
 
 const app = express();
+app.use(cors());
 
 const PORT = 3000;
 
