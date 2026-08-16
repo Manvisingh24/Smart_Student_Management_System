@@ -27,16 +27,30 @@ function Students() {
 
       <p>Manage student information here.</p>
 
-      <div>
-        {students.map((student) => (
-          <div key={student.rollNo}>
-            <h3>{student.name}</h3>
-            <p>Roll No: {student.rollNo}</p>
-            <p>Age: {student.age}</p>
-            <p>Course: {student.course}</p>
-            <p>Marks: {student.marks}</p>
-          </div>
-        ))}
+      <div className="students-table-container">
+        <table className="students-table">
+          <thead>
+            <tr>
+              <th>Roll No.</th>
+              <th>Name</th>
+              <th>Age</th>
+              <th>Course</th>
+              <th>Marks</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {students.map((student) => (
+              <tr key={student.rollNo}>
+                <td>{student.rollNo}</td>
+                <td>{student.name}</td>
+                <td>{student.age}</td>
+                <td>{student.course}</td>
+                <td>{student.marks}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </main>
   );

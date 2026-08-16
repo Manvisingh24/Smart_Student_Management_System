@@ -77,3 +77,30 @@ body {
   font-size: 28px;
   font-weight: bold;
 }
+
+.students-table-container {
+  margin-top: 25px;
+  overflow-x: auto;
+}
+
+.students-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+}
+
+.students-table th,
+.students-table td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+}
+
+.students-table th {
+  background-color: #f4f4f4;
+  font-weight: 600;
+}
+
+.students-table tr:hover {
+  background-color: #f9f9f9;
+}
