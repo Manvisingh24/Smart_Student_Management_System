@@ -24,6 +24,39 @@ function Students() {
       });
   };
 
+  const handleDelete = async (rollNo) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this student?"
+    );
+
+    if (!confirmDelete) {
+      return;
+    }
+    const token = localStorage.getItem("token");
+
+    try {
+      const response = await fetch(
+        `http://localhost:3000/api/students/${rollNo}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      console.log("Delete response:", data);
+
+      if (response.ok) {
+        fetchStudents();
+      }
+    } catch (error) {
+      console.error("Error deleting student:", error);
+    }
+  };
+
   useEffect(() => {
     fetchStudents();
   }, []);
@@ -38,12 +71,12 @@ function Students() {
 
       {editingStudent && (
         <EditStudent
-        student={editingStudent}
-        onStudentUpdated={() => {
-          fetchStudents();
-          setEditingStudent(null);
-        }}
-        onCancel={() => setEditingStudent(null)}
+          student={editingStudent}
+          onStudentUpdated={() => {
+            fetchStudents();
+            setEditingStudent(null);
+          }}
+          onCancel={() => setEditingStudent(null)}
         />
       )}
 
@@ -70,9 +103,13 @@ function Students() {
                 <td>{student.marks}</td>
 
                 <td>
-                <button onClick={() => setEditingStudent(student)}>
-                Edit
-                </button>
+                  <button onClick={() => setEditingStudent(student)}>
+                    Edit
+                  </button>
+
+                  <button onClick={() => handleDelete(student.rollNo)}>
+                    Delete
+                  </button>
                 </td>
               </tr>
             ))}
