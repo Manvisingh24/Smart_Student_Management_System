@@ -1,8 +1,10 @@
 import AddStudent from "./AddStudent";
+import EditStudent from "./EditStudent";
 import { useEffect, useState } from "react";
 
 function Students() {
   const [students, setStudents] = useState([]);
+  const [editingStudent, setEditingStudent] = useState(null);
 
   const fetchStudents = () => {
     const token = localStorage.getItem("token");
@@ -34,6 +36,17 @@ function Students() {
 
       <AddStudent onStudentAdded={fetchStudents} />
 
+      {editingStudent && (
+        <EditStudent
+        student={editingStudent}
+        onStudentUpdated={() => {
+          fetchStudents();
+          setEditingStudent(null);
+        }}
+        onCancel={() => setEditingStudent(null)}
+        />
+      )}
+
       <div className="students-table-container">
         <table className="students-table">
           <thead>
@@ -43,6 +56,7 @@ function Students() {
               <th>Age</th>
               <th>Course</th>
               <th>Marks</th>
+              <th>Actions</th>
             </tr>
           </thead>
 
@@ -54,6 +68,12 @@ function Students() {
                 <td>{student.age}</td>
                 <td>{student.course}</td>
                 <td>{student.marks}</td>
+
+                <td>
+                <button onClick={() => setEditingStudent(student)}>
+                Edit
+                </button>
+                </td>
               </tr>
             ))}
           </tbody>

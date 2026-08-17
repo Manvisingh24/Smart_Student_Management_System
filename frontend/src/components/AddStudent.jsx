@@ -38,9 +38,15 @@ function AddStudent({ onStudentAdded }) {
       console.log("Server response:", data);
 
       if (response.ok) {
+        setName("");
+        setRollNo("");
+        setAge("");
+        setCourse("");
+        setMarks("");
+
         onStudentAdded();
       }
-      
+
     } catch (error) {
       console.error("Error:", error);
     }
