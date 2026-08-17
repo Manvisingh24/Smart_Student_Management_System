@@ -1,9 +1,10 @@
+import AddStudent from "./AddStudent";
 import { useEffect, useState } from "react";
 
 function Students() {
   const [students, setStudents] = useState([]);
 
-  useEffect(() => {
+  const fetchStudents = () => {
     const token = localStorage.getItem("token");
 
     fetch("http://localhost:3000/api/students", {
@@ -14,11 +15,15 @@ function Students() {
       .then((response) => response.json())
       .then((data) => {
         console.log(data);
-        setStudents(data.data);
+        setStudents(data.data || []);
       })
       .catch((error) => {
         console.error("Error fetching students:", error);
       });
+  };
+
+  useEffect(() => {
+    fetchStudents();
   }, []);
 
   return (
@@ -26,6 +31,8 @@ function Students() {
       <h1>Students</h1>
 
       <p>Manage student information here.</p>
+
+      <AddStudent onStudentAdded={fetchStudents} />
 
       <div className="students-table-container">
         <table className="students-table">
