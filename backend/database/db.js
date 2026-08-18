@@ -25,3 +25,20 @@ const db = new sqlite3.Database("../students.db", (err) => {
 });
 
 module.exports = db;
+
+// Create attendance table
+db.run(`
+    CREATE TABLE IF NOT EXISTS attendance (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        rollNo INTEGER NOT NULL,
+        date TEXT NOT NULL,
+        status TEXT NOT NULL,
+        FOREIGN KEY (rollNo) REFERENCES students(rollNo)
+    )
+`, (err) => {
+    if (err) {
+        console.error("Error creating attendance table:", err.message);
+    } else {
+        console.log("Attendance table is ready!");
+    }
+});

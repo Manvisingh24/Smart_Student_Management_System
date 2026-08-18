@@ -5,6 +5,7 @@ import Sidebar from "./components/Sidebar";
 import Dashboard from "./components/Dashboard";
 import Students from "./components/Students";
 import Login from "./pages/Login";
+import Attendance from "./components/Attendance";
 
 import "./App.css";
 
@@ -29,6 +30,7 @@ function App() {
                 <Routes>
                   <Route path="/" element={<Dashboard />} />
                   <Route path="/students" element={<Students />} />
+                  <Route path="/attendance" element={<Attendance />} />
                 </Routes>
               </div>
             </div>
