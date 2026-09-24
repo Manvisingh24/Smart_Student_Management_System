@@ -2,7 +2,9 @@ const db = require("../database/db");
 
 // Get all attendance records
 const getAllAttendance = (req, res) => {
-    const sql = `
+    const { date } = req.query;
+
+    let sql = `
         SELECT
             attendance.id,
             attendance.rollNo,
@@ -12,10 +14,18 @@ const getAllAttendance = (req, res) => {
         FROM attendance
         JOIN students
         ON attendance.rollNo = students.rollNo
-        ORDER BY attendance.date DESC
     `;
 
-    db.all(sql, [], (err, rows) => {
+    let params = [];
+
+    if (date) {
+        sql += " WHERE attendance.date = ?";
+        params.push(date);
+    }
+
+    sql += " ORDER BY attendance.rollNo ASC";
+
+    db.all(sql, params, (err, rows) => {
         if (err) {
             console.error("Error fetching attendance:", err.message);
 
@@ -51,6 +61,15 @@ const markAttendance = (req, res) => {
         });
     }
 
+    const today = new Date().toISOString().split("T")[0];
+
+    if (date > today) {
+        return res.status(400).json({
+            success: false,
+            message: "Attendance cannot be marked for a future date"
+        });
+    }
+
     // First check whether the student exists
     const studentSql = "SELECT * FROM students WHERE rollNo = ?";
 
@@ -71,28 +90,61 @@ const markAttendance = (req, res) => {
             });
         }
 
-        const sql = `
-            INSERT INTO attendance (rollNo, date, status)
-            VALUES (?, ?, ?)
-        `;
+        // Check if attendance for this student + date already exists
+        const checkSql = "SELECT * FROM attendance WHERE rollNo = ? AND date = ?";
 
-        db.run(sql, [rollNo, date, status], function(err) {
+        db.get(checkSql, [rollNo, date], (err, existingRecord) => {
             if (err) {
-                console.error("Error marking attendance:", err.message);
+                console.error("Error checking existing attendance:", err.message);
 
                 return res.status(500).json({
                     success: false,
-                    message: "Failed to mark attendance"
+                    message: "Failed to check existing attendance"
                 });
             }
 
-            res.status(201).json({
-                success: true,
-                message: "Attendance marked successfully!",
-                data: {
-                    attendanceId: this.lastID
-                }
-            });
+            if (existingRecord) {
+                const updateSql = "UPDATE attendance SET status = ? WHERE id = ?";
+
+                db.run(updateSql, [status, existingRecord.id], function (err) {
+                    if (err) {
+                        console.error("Error updating attendance:", err.message);
+
+                        return res.status(500).json({
+                            success: false,
+                            message: "Failed to update attendance"
+                        });
+                    }
+
+                    res.status(200).json({
+                        success: true,
+                        message: "Attendance updated successfully!",
+                        data: { attendanceId: existingRecord.id }
+                    });
+                });
+            } else {
+                const insertSql = `
+                    INSERT INTO attendance (rollNo, date, status)
+                    VALUES (?, ?, ?)
+                `;
+
+                db.run(insertSql, [rollNo, date, status], function (err) {
+                    if (err) {
+                        console.error("Error marking attendance:", err.message);
+
+                        return res.status(500).json({
+                            success: false,
+                            message: "Failed to mark attendance"
+                        });
+                    }
+
+                    res.status(201).json({
+                        success: true,
+                        message: "Attendance marked successfully!",
+                        data: { attendanceId: this.lastID }
+                    });
+                });
+            }
         });
     });
 };

@@ -5,138 +5,199 @@ function Attendance() {
   const [attendance, setAttendance] = useState({});
   const [date, setDate] = useState("");
 
-  const fetchAttendance = async () => {
-  const token = localStorage.getItem("token");
+  // Fetch all students
+  const fetchStudents = async () => {
+    const token = localStorage.getItem("token");
 
-  try {
-    const response = await fetch("http://localhost:3000/api/attendance", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    try {
+      const response = await fetch("http://localhost:3000/api/students", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-    const data = await response.json();
+      const data = await response.json();
 
-    console.log("Attendance list:", data);
+      console.log("Students:", data);
 
-    if (response.ok) {
-      setAttendance(data.data);
-    } else {
-      console.error("Failed to fetch attendance:", data.message);
+      if (response.ok) {
+        setStudents(data.data);
+      } else {
+        console.error("Failed to fetch students:", data.message);
+      }
+    } catch (error) {
+      console.error("Error fetching students:", error);
     }
-  } catch (error) {
-    console.error("Error fetching attendance:", error);
-  }
-};
+  };
 
-useEffect(() => {
-  fetchAttendance();
-}, []);
+  // Fetch existing attendance
+  const fetchAttendance = async (selectedDate) => {
+    const token = localStorage.getItem("token");
 
-  const handleSubmit = async (e) => {
-  e.preventDefault();
-
-  const token = localStorage.getItem("token");
-
-  try {
-    const response = await fetch("http://localhost:3000/api/attendance", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        rollNo,
-        date,
-        status,
-      }),
-    });
-
-    const data = await response.json();
-
-    console.log("Attendance response:", data);
-
-    if (!response.ok) {
-      alert(data.message || "Failed to mark attendance");
+    if (!selectedDate) {
+      setAttendance({});
       return;
     }
 
-    alert("Attendance marked successfully!");
-    fetchAttendance();
+    try {
+      const response = await fetch(
+      `http://localhost:3000/api/attendance?date=${selectedDate}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-  } catch (error) {
-    console.error("Error marking attendance:", error);
-    alert("Something went wrong");
-  }
-};
+      const data = await response.json();
 
+      console.log("Attendance for", selectedDate, ":", data);
+
+      if (response.ok) {
+        const attendanceMap = {};
+
+        data.data.forEach((record) => {
+          attendanceMap[record.rollNo] = record.status;
+        });
+
+        setAttendance(attendanceMap);
+      } else {
+        console.error("Failed to fetch attendance:", data.message);
+      }
+    } catch (error) {
+      console.error("Error fetching attendance:", error);
+    }
+  };
+
+  // Run when page opens
+  useEffect(() => {
+    fetchStudents();
+  }, []);
+
+  // Change attendance status for one student
+  const handleStatusChange = (rollNo, status) => {
+    setAttendance((previous) => ({
+      ...previous,
+      [rollNo]: status,
+    }));
+  };
+
+  // Save attendance
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!date) {
+      alert("Please select a date.");
+      return;
+    }
+
+    const token = localStorage.getItem("token");
+
+    try {
+      for (const student of students) {
+        const status = attendance[student.rollNo] || "Absent";
+
+        const response = await fetch("http://localhost:3000/api/attendance", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            rollNo: student.rollNo,
+            date,
+            status,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          alert(
+            `Failed for Roll No. ${student.rollNo}: ${
+              data.message || "Something went wrong"
+            }`
+          );
+          return;
+        }
+      }
+
+      alert("Attendance saved successfully!");
+
+      fetchAttendance(date);
+
+    } catch (error) {
+      console.error("Error saving attendance:", error);
+      alert("Something went wrong while saving attendance.");
+    }
+  };
 
   return (
     <main className="dashboard">
       <h1>Attendance</h1>
 
-      <p>Manage student attendance here.</p>
+      <p>Mark attendance for all students.</p>
 
       <form onSubmit={handleSubmit}>
         <div>
-          <label>Roll No.</label>
-          <input
-            type="number"
-            value={rollNo}
-            onChange={(e) => setRollNo(e.target.value)}
-            placeholder="Enter roll number"
-          />
-        </div>
-
-        <div>
           <label>Date</label>
+
           <input
             type="date"
             value={date}
-            onChange={(e) => setDate(e.target.value)}
+            max={new Date().toISOString().split("T")[0]}
+            onChange={(e) => {
+              const selectedDate = e.target.value;
+
+              setDate(selectedDate);
+              fetchAttendance(selectedDate);
+            }}
           />
         </div>
 
-        <div>
-          <label>Status</label>
+        <h2>Student Attendance</h2>
 
-          <select
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-          >
-            <option value="Present">Present</option>
-            <option value="Absent">Absent</option>
-          </select>
+        <div className="students-table-container">
+          <table className="students-table">
+            <thead>
+              <tr>
+                <th>Roll No.</th>
+                <th>Name</th>
+                <th>Attendance</th>
+              </tr>
+            </thead>
+            
+            <tbody>
+              {[...students]
+                .sort((a, b) => a.rollNo - b.rollNo)
+                .map((student) => (
+                  <tr key={student.rollNo}>
+                    <td>{student.rollNo}</td>
+
+                    <td>{student.name}</td>
+
+                    <td>
+                      <select
+                        value={attendance[student.rollNo] || "Absent"}
+                        onChange={(e) =>
+                          handleStatusChange(
+                            student.rollNo,
+                            e.target.value
+                          )
+                        }
+                      >
+                        <option value="Present">Present</option>
+                        <option value="Absent">Absent</option>
+                      </select>
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
         </div>
 
-        <button type="submit">Mark Attendance</button>
-            </form>
-
-            <h2>Attendance Records</h2>
-
-            <div className="students-table-container">
-                <table className="students-table">
-                    <thead>
-                        <tr>
-                            <th>Roll No.</th>
-                            <th>Name</th>
-                            <th>Date</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                    {attendance.map((record) => (
-                        <tr key={record.id}>
-                            <td>{record.rollNo}</td>
-                            <td>{record.name}</td>
-                            <td>{record.date}</td>
-                            <td>{record.status}</td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>    
+        <button type="submit">Save Attendance</button>
+      </form>
     </main>
   );
 }

@@ -34,7 +34,7 @@ function Login() {
 
         navigate("/");
         } else {
-            console.error(data.message);
+            console.error("Login failed:", data.error);
         }
 
     } catch (error) {
