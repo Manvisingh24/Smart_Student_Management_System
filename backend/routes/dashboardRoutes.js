@@ -1,6 +1,5 @@
 const express = require("express");
 const router = express.Router();
-// Import database connection (adjust path if db module is located elsewhere like ../config/db)
 const db = require("../db"); 
 
 // GET /api/dashboard/stats
@@ -17,12 +16,18 @@ router.get("/stats", async (req, res) => {
     // 3. Calculate Average Marks
     const [marks] = await db.query("SELECT ROUND(AVG(marksObtained), 1) AS avgMarks FROM marks");
 
+    // 4. Calculate Subject-Wise Averages (New for Phase 7 Analytics)
+    const [subjectAverages] = await db.query(
+      "SELECT subjectId, ROUND(AVG(marksObtained), 1) AS avgScore FROM marks GROUP BY subjectId"
+    );
+
     res.json({
       success: true,
       data: {
         totalStudents: students[0]?.total || 0,
         avgAttendance: attendance[0]?.avgAttendance || 0,
         avgMarks: marks[0]?.avgMarks || 0,
+        subjectAverages: subjectAverages || [],
       },
     });
   } catch (error) {
