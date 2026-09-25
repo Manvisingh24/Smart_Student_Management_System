@@ -17,8 +17,15 @@ function Sidebar() {
         <li>
           <Link to="/attendance">Attendance</Link>
         </li>
-        <li>Marks</li>
-        <li>Analytics</li>
+
+        {/* Wrapped Marks in a Link component */}
+        <li>
+          <Link to="/marks">Marks</Link>
+        </li>
+
+        <li>
+          <Link to="/analytics">Analytics</Link>
+        </li>
       </ul>
     </aside>
   );
