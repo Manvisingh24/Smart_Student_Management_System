@@ -8,6 +8,7 @@ import Login from "./pages/Login";
 import Attendance from "./components/Attendance";
 import Marks from "./components/Marks";
 import Analytics from "./components/Analytics";
+import NotFound from "./components/NotFound";
 
 import "./App.css";
 
@@ -35,6 +36,7 @@ function App() {
                   <Route path="/attendance" element={<Attendance />} />
                   <Route path="/marks" element={<Marks />} />
                   <Route path="/analytics" element={<Analytics />} />
+                  <Route path="*" element={<NotFound />} />
                 </Routes>
               </div>
             </div>
