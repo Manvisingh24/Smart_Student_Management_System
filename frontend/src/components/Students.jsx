@@ -5,6 +5,10 @@ import { useEffect, useState } from "react";
 function Students() {
   const [students, setStudents] = useState([]);
   const [editingStudent, setEditingStudent] = useState(null);
+  
+  // Search & Filter state for Phase 5 requirements
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCourse, setSelectedCourse] = useState("ALL");
 
   const fetchStudents = () => {
     const token = localStorage.getItem("token");
@@ -61,6 +65,27 @@ function Students() {
     fetchStudents();
   }, []);
 
+  // Extract unique courses dynamically for the dropdown filter
+  const courses = [
+    "ALL",
+    ...Array.from(
+      new Set(students.map((s) => s.course).filter(Boolean))
+    ),
+  ];
+
+  // Filter students based on search query and course selection
+  const filteredStudents = students.filter((student) => {
+    const term = searchTerm.toLowerCase();
+    const matchesName = student.name ? student.name.toLowerCase().includes(term) : false;
+    const matchesRoll = student.rollNo ? String(student.rollNo).toLowerCase().includes(term) : false;
+    const matchesSearch = matchesName || matchesRoll;
+
+    const matchesCourse =
+      selectedCourse === "ALL" || student.course === selectedCourse;
+
+    return matchesSearch && matchesCourse;
+  });
+
   return (
     <main className="dashboard">
       <h1>Students</h1>
@@ -80,6 +105,48 @@ function Students() {
         />
       )}
 
+      {/* --- Phase 5: Search & Filter Controls --- */}
+      <div
+        style={{
+          display: "flex",
+          gap: "15px",
+          margin: "20px 0",
+          alignItems: "center",
+        }}
+      >
+        <input
+          type="text"
+          placeholder="Search by Name or Roll No..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          style={{
+            flex: "2",
+            padding: "8px 12px",
+            fontSize: "14px",
+            borderRadius: "4px",
+            border: "1px solid #ccc",
+          }}
+        />
+
+        <select
+          value={selectedCourse}
+          onChange={(e) => setSelectedCourse(e.target.value)}
+          style={{
+            flex: "1",
+            padding: "8px 12px",
+            fontSize: "14px",
+            borderRadius: "4px",
+            border: "1px solid #ccc",
+          }}
+        >
+          {courses.map((course) => (
+            <option key={course} value={course}>
+              {course === "ALL" ? "All Courses" : course}
+            </option>
+          ))}
+        </select>
+      </div>
+
       <div className="students-table-container">
         <table className="students-table">
           <thead>
@@ -94,25 +161,33 @@ function Students() {
           </thead>
 
           <tbody>
-            {students.map((student) => (
-              <tr key={student.rollNo}>
-                <td>{student.rollNo}</td>
-                <td>{student.name}</td>
-                <td>{student.age}</td>
-                <td>{student.course}</td>
-                <td>{student.marks}</td>
-
-                <td>
-                  <button onClick={() => setEditingStudent(student)}>
-                    Edit
-                  </button>
-
-                  <button onClick={() => handleDelete(student.rollNo)}>
-                    Delete
-                  </button>
+            {filteredStudents.length === 0 ? (
+              <tr>
+                <td colSpan="6" style={{ textAlign: "center", padding: "15px" }}>
+                  No matching students found.
                 </td>
               </tr>
-            ))}
+            ) : (
+              filteredStudents.map((student) => (
+                <tr key={student.rollNo}>
+                  <td>{student.rollNo}</td>
+                  <td>{student.name}</td>
+                  <td>{student.age}</td>
+                  <td>{student.course}</td>
+                  <td>{student.marks}</td>
+
+                  <td>
+                    <button onClick={() => setEditingStudent(student)}>
+                      Edit
+                    </button>
+
+                    <button onClick={() => handleDelete(student.rollNo)}>
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
