@@ -8,6 +8,7 @@ const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");  
 const attendanceRoutes = require("./routes/attendanceRoutes");
 const marksRoutes = require("./routes/marksRoutes");
+const dashboardRoutes = require("./routes/dashboardRoutes");
 
 
 const app = express();
@@ -22,6 +23,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/attendance", attendanceRoutes);
 app.use("/api/marks", marksRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 
 app.get("/", (req, res) => {
     res.send("Smart Student Management System Backend is Running!");
