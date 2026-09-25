@@ -8,6 +8,7 @@ import Login from "./pages/Login";
 import Attendance from "./components/Attendance";
 import Marks from "./components/Marks";
 import Analytics from "./components/Analytics";
+import StudentDashboard from "./components/StudentDashboard";
 import NotFound from "./components/NotFound";
 
 import "./App.css";
@@ -19,6 +20,9 @@ function App() {
 
         {/* Login page */}
         <Route path="/login" element={<Login />} />
+
+        {/* Student Portal (Standalone Page without Admin Sidebar) */}
+        <Route path="/student-dashboard" element={<StudentDashboard />} />
 
         {/* Main application */}
         <Route
