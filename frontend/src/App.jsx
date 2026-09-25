@@ -7,6 +7,7 @@ import Students from "./components/Students";
 import Login from "./pages/Login";
 import Attendance from "./components/Attendance";
 import Marks from "./components/Marks";
+import Analytics from "./components/Analytics";
 
 import "./App.css";
 
@@ -33,6 +34,7 @@ function App() {
                   <Route path="/students" element={<Students />} />
                   <Route path="/attendance" element={<Attendance />} />
                   <Route path="/marks" element={<Marks />} />
+                  <Route path="/analytics" element={<Analytics />} />
                 </Routes>
               </div>
             </div>
