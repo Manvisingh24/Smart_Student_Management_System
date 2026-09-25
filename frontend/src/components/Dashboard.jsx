@@ -13,22 +13,18 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchDashboardStats = async () => {
       try {
-        // Fetch students list to compute total count
-        const studentsRes = await fetch("http://localhost:3000/api/students", {
+        const res = await fetch("http://localhost:3000/api/dashboard/stats", {
           headers: { Authorization: `Bearer ${token}` },
         });
-        const studentsData = await studentsRes.json();
-        
-        const studentCount = studentsData.success 
-          ? (Array.isArray(studentsData.data) ? studentsData.data.length : 0)
-          : 0;
+        const result = await res.json();
 
-        // Set metrics state (replace/expand endpoints as your backend stats route grows)
-        setStats({
-          totalStudents: studentCount,
-          avgAttendance: 85, // Placeholder metric until dedicated stats API is fetched
-          avgMarks: 78,      // Placeholder metric until dedicated stats API is fetched
-        });
+        if (result.success) {
+          setStats({
+            totalStudents: result.data.totalStudents,
+            avgAttendance: result.data.avgAttendance,
+            avgMarks: result.data.avgMarks,
+          });
+        }
       } catch (err) {
         console.error("Error loading dashboard metrics:", err);
       } finally {
@@ -65,10 +61,10 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Quick Action Panel */}
+      {/* System Overview Panel */}
       <div style={{ border: "1px solid #ddd", padding: "20px", borderRadius: "8px", backgroundColor: "#f9f9f9" }}>
         <h4>System Status</h4>
-        <p>All core services (Authentication, Students, Attendance, Marks) are operating cleanly.</p>
+        <p>All core services (Authentication, Students, Attendance, Marks, Analytics) are connected and operating.</p>
       </div>
     </div>
   );
