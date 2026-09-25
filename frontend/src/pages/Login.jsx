@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+// Read API URL from Vite environment variables with a fallback for local development
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
 function Login() {
   const navigate = useNavigate();
 
@@ -14,7 +17,7 @@ function Login() {
 
     try {
       const response = await fetch(
-        "http://localhost:3000/api/auth/login",
+        `${API_URL}/api/auth/login`,
         {
           method: "POST",
           headers: {
