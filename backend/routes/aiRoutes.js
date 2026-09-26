@@ -1,16 +1,16 @@
 const express = require("express");
 const router = express.Router();
 const { generateStudentInsights } = require("../services/aiService");
+const { verifyToken } = require("../middleware/authMiddleware"); // Adjust path/name to match your middleware
 
-// POST /api/ai/insights
-router.post("/insights", async (req, res) => {
+// Protect route with JWT verification
+router.post("/insights", verifyToken, async (req, res) => {
   try {
     const { studentData } = req.body;
 
-    // Fallback if studentData is sent directly or inside req.user
     const payload = studentData || {
-      name: req.body?.name || req.user?.name || "Student",
-      rollNo: req.body?.rollNo || req.user?.rollNo || "N/A",
+      name: req.user?.name || "Student",
+      rollNo: req.user?.rollNo || "N/A",
       marks: req.body?.marks || []
     };
 
