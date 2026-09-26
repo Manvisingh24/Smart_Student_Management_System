@@ -1,97 +1,138 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 
-export default function StudentDashboard() {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
-  // Get user info stored during login
-  const token = localStorage.getItem("token");
-  const storedRollNo = localStorage.getItem("rollNo"); // ensure rollNo is saved on login
+function StudentDashboard() {
+  const [studentData, setStudentData] = useState(null);
+  const [aiInsights, setAiInsights] = useState("");
+  const [loadingAi, setLoadingAi] = useState(false);
+  const [loadingData, setLoadingData] = useState(true);
 
+  // 1. Fetch student dashboard data on component mount
   useEffect(() => {
-    if (!storedRollNo) {
-      setLoading(false);
-      return;
-    }
-
-    const fetchStudentData = async () => {
+    const fetchDashboardData = async () => {
       try {
-        const res = await fetch(`http://localhost:3000/api/student-dashboard/${storedRollNo}`, {
-          headers: { Authorization: `Bearer ${token}` },
+        const token = localStorage.getItem("token");
+        const response = await fetch(`${API_URL}/api/student/dashboard`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         });
-        const result = await res.json();
-        if (result.success) {
-          setData(result.data);
+
+        if (response.ok) {
+          const data = await response.json();
+          setStudentData(data);
         }
-      } catch (err) {
-        console.error("Failed to load student portal data:", err);
+      } catch (error) {
+        console.error("Error loading dashboard data:", error);
       } finally {
-        setLoading(false);
+        setLoadingData(false);
       }
     };
 
-    fetchStudentData();
-  }, [storedRollNo, token]);
+    fetchDashboardData();
+  }, []);
 
-  if (loading) return <div style={{ padding: "20px" }}>Loading your dashboard...</div>;
-  if (!storedRollNo || !data) return <div style={{ padding: "20px" }}>No student profile linked or found.</div>;
+  // 2. Fetch AI Insights from Backend
+  const handleGetAiInsights = async () => {
+    console.log("AI Insights requested...");
+    setLoadingAi(true);
+    setAiInsights("");
 
-  const { profile, attendance, marks } = data;
+    // Use studentData if available, fallback to localStorage/defaults
+    const payload = {
+      name: studentData?.name || localStorage.getItem("userName") || "Student",
+      rollNo: studentData?.rollNo || localStorage.getItem("rollNo") || "N/A",
+      marks: studentData?.marks || [
+        { subject: "Mathematics", score: 85 },
+        { subject: "Computer Science", score: 90 },
+      ],
+    };
+
+    try {
+      const response = await fetch(`${API_URL}/api/ai/insights`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setAiInsights(data.insights);
+      } else {
+        setAiInsights(data.error || "Failed to fetch AI insights. Please try again.");
+      }
+    } catch (error) {
+      console.error("AI Fetch Error:", error);
+      setAiInsights("Error connecting to AI service.");
+    } finally {
+      setLoadingAi(false);
+    }
+  };
 
   return (
-    <div style={{ padding: "20px", maxWidth: "900px", margin: "0 auto" }}>
-      <h2>Student Portal</h2>
+    <div style={{ padding: "20px", maxWidth: "800px", margin: "0 auto" }}>
+      <h2>Student Dashboard</h2>
 
-      {/* Profile Card */}
-      <div style={cardStyle}>
-        <h3>Profile Information</h3>
-        <p><strong>Name:</strong> {profile.name}</p>
-        <p><strong>Roll No:</strong> {profile.rollNo}</p>
-        <p><strong>Course:</strong> {profile.course}</p>
-        <p><strong>Age:</strong> {profile.age}</p>
-      </div>
+      {loadingData ? (
+        <p>Loading dashboard profile...</p>
+      ) : (
+        studentData && (
+          <div style={{ marginBottom: "20px" }}>
+            <p><strong>Name:</strong> {studentData.name}</p>
+            <p><strong>Roll No:</strong> {studentData.rollNo}</p>
+          </div>
+        )
+      )}
 
-      {/* Attendance Summary */}
-      <div style={cardStyle}>
-        <h3>Attendance Summary</h3>
-        <p><strong>Total Classes:</strong> {attendance.totalClasses}</p>
-        <p><strong>Attended:</strong> {attendance.presentClasses}</p>
-        <p><strong>Attendance Percentage:</strong> <span style={{ color: "#007bff", fontWeight: "bold" }}>{attendance.percentage}%</span></p>
-      </div>
+      {/* AI Insights Card */}
+      <div
+        style={{
+          border: "1px solid #e0e0e0",
+          borderRadius: "8px",
+          padding: "20px",
+          marginTop: "20px",
+          backgroundColor: "#f9f9ff",
+        }}
+      >
+        <h3>🤖 AI Performance Assistant</h3>
+        <p>Get instant AI-driven analysis and tips based on your marks.</p>
 
-      {/* Marks Summary */}
-      <div style={cardStyle}>
-        <h3>Marks & Results</h3>
-        {marks.length === 0 ? (
-          <p>No marks recorded yet.</p>
-        ) : (
-          <table style={{ width: "100%", borderCollapse: "collapse" }} border="1">
-            <thead>
-              <tr style={{ backgroundColor: "#f2f2f2" }}>
-                <th style={{ padding: "8px" }}>Subject</th>
-                <th style={{ padding: "8px" }}>Marks Obtained</th>
-              </tr>
-            </thead>
-            <tbody>
-              {marks.map((m, idx) => (
-                <tr key={idx}>
-                  <td style={{ padding: "8px" }}>{m.subject}</td>
-                  <td style={{ padding: "8px", textAlign: "center" }}>{m.marksObtained}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <button
+          onClick={handleGetAiInsights}
+          disabled={loadingAi}
+          type="button"
+          style={{
+            padding: "10px 16px",
+            backgroundColor: loadingAi ? "#999" : "#6200ee",
+            color: "#fff",
+            border: "none",
+            borderRadius: "4px",
+            cursor: loadingAi ? "not-allowed" : "pointer",
+          }}
+        >
+          {loadingAi ? "Generating Insights..." : "Generate AI Insights"}
+        </button>
+
+        {aiInsights && (
+          <div
+            style={{
+              marginTop: "15px",
+              padding: "12px",
+              backgroundColor: "#ffffff",
+              borderLeft: "4px solid #6200ee",
+              whiteSpace: "pre-wrap",
+            }}
+          >
+            {aiInsights}
+          </div>
         )}
       </div>
     </div>
   );
 }
 
-const cardStyle = {
-  backgroundColor: "#fff",
-  border: "1px solid #e0e0e0",
-  borderRadius: "8px",
-  padding: "20px",
-  marginBottom: "20px",
-  boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
-};
+export default StudentDashboard;
