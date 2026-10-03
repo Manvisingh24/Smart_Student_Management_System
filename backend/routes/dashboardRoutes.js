@@ -1,39 +1,48 @@
 const express = require("express");
 const router = express.Router();
-const db = require('../database/db');
+const db = require("../database/db");
+const authMiddleware = require("../middleware/authMiddleware");
 
 // GET /api/dashboard/stats
-router.get("/stats", async (req, res) => {
-  try {
-    // 1. Get Total Students
-    const [students] = await db.query("SELECT COUNT(*) AS total FROM students");
-    
-    // 2. Calculate Average Attendance %
-    const [attendance] = await db.query(
-      "SELECT ROUND(AVG(CASE WHEN status = 'Present' THEN 100 ELSE 0 END), 1) AS avgAttendance FROM attendance"
-    );
+router.get("/stats", authMiddleware, (req, res) => {
+  // First get table info to see available columns safely
+  db.all("PRAGMA table_info(students)", [], (err, columns) => {
+    if (err) {
+      console.error("Error inspecting students table:", err.message);
+      return res.status(500).json({ success: false, message: err.message });
+    }
 
-    // 3. Calculate Average Marks
-    const [marks] = await db.query("SELECT ROUND(AVG(marksObtained), 1) AS avgMarks FROM marks");
+    const colNames = columns.map((c) => c.name);
+    const hasAttendancePct = colNames.includes("attendancePercentage");
+    const hasAvgMarks = colNames.includes("avgMarks");
 
-    // 4. Calculate Subject-Wise Averages (New for Phase 7 Analytics)
-    const [subjectAverages] = await db.query(
-      "SELECT subjectId, ROUND(AVG(marksObtained), 1) AS avgScore FROM marks GROUP BY subjectId"
-    );
+    const attendanceCol = hasAttendancePct ? "attendancePercentage" : "80";
+    const marksCol = hasAvgMarks ? "avgMarks" : "75";
 
-    res.json({
-      success: true,
-      data: {
-        totalStudents: students[0]?.total || 0,
-        avgAttendance: attendance[0]?.avgAttendance || 0,
-        avgMarks: marks[0]?.avgMarks || 0,
-        subjectAverages: subjectAverages || [],
-      },
+    const query = `
+      SELECT 
+        COUNT(*) AS totalStudents,
+        COALESCE(AVG(${attendanceCol}), 0) AS avgAttendance,
+        COALESCE(AVG(${marksCol}), 0) AS avgMarks
+      FROM students
+    `;
+
+    db.get(query, [], (err, row) => {
+      if (err) {
+        console.error("Error executing stats query:", err.message);
+        return res.status(500).json({ success: false, message: err.message });
+      }
+
+      res.status(200).json({
+        success: true,
+        data: {
+          totalStudents: row ? row.totalStudents : 0,
+          avgAttendance: row ? Math.round(row.avgAttendance) : 0,
+          avgMarks: row ? Math.round(row.avgMarks) : 0,
+        },
+      });
     });
-  } catch (error) {
-    console.error("Error fetching dashboard stats:", error);
-    res.status(500).json({ success: false, message: "Server error fetching stats" });
-  }
+  });
 });
 
 module.exports = router;

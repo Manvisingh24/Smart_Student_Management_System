@@ -1,205 +1,217 @@
-import { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 
-function Attendance() {
-  const [students, setStudents] = useState([]);
-  const [attendance, setAttendance] = useState({});
-  const [date, setDate] = useState("");
+export default function Attendance() {
+  const [selectedDate, setSelectedDate] = useState(
+    new Date().toISOString().split("T")[0]
+  );
+  const [attendanceList, setAttendanceList] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [draftAttendance, setDraftAttendance] = useState({});
 
-  // Fetch all students
-  const fetchStudents = async () => {
-    const token = localStorage.getItem("token");
-
+  const fetchDailyAttendance = async (dateStr) => {
+    setLoading(true);
     try {
-      const response = await fetch("http://localhost:3000/api/students", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const data = await response.json();
-
-      console.log("Students:", data);
-
-      if (response.ok) {
-        setStudents(data.data);
-      } else {
-        console.error("Failed to fetch students:", data.message);
-      }
-    } catch (error) {
-      console.error("Error fetching students:", error);
-    }
-  };
-
-  // Fetch existing attendance
-  const fetchAttendance = async (selectedDate) => {
-    const token = localStorage.getItem("token");
-
-    if (!selectedDate) {
-      setAttendance({});
-      return;
-    }
-
-    try {
-      const response = await fetch(
-      `http://localhost:3000/api/attendance?date=${selectedDate}`,
+      const token = localStorage.getItem("token");
+      const res = await fetch(
+        `http://localhost:3000/api/students/attendance/daily?date=${dateStr}`,
         {
           headers: {
+            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
         }
       );
+      const result = await res.json();
+      if (result.success) {
+        const records = result.data || [];
+        setAttendanceList(records);
 
-      const data = await response.json();
-
-      console.log("Attendance for", selectedDate, ":", data);
-
-      if (response.ok) {
-        const attendanceMap = {};
-
-        data.data.forEach((record) => {
-          attendanceMap[record.rollNo] = record.status;
+        const initialDraft = {};
+        records.forEach((s) => {
+          initialDraft[s.rollNo] =
+            s.status && s.status.toLowerCase() !== "not marked"
+              ? s.status
+              : "Present";
         });
-
-        setAttendance(attendanceMap);
-      } else {
-        console.error("Failed to fetch attendance:", data.message);
+        setDraftAttendance(initialDraft);
       }
-    } catch (error) {
-      console.error("Error fetching attendance:", error);
+    } catch (err) {
+      console.error("Error fetching attendance:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Run when page opens
   useEffect(() => {
-    fetchStudents();
-  }, []);
+    fetchDailyAttendance(selectedDate);
+  }, [selectedDate]);
 
-  // Change attendance status for one student
-  const handleStatusChange = (rollNo, status) => {
-    setAttendance((previous) => ({
-      ...previous,
+  const isLocked = attendanceList.some(
+    (item) => item.status && item.status.toLowerCase() !== "not marked"
+  );
+
+  const handleSelectStatus = (rollNo, status) => {
+    setDraftAttendance((prev) => ({
+      ...prev,
       [rollNo]: status,
     }));
   };
 
-  // Save attendance
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!date) {
-      alert("Please select a date.");
-      return;
-    }
-
-    const token = localStorage.getItem("token");
-
+  const handleSaveAndLock = async () => {
     try {
-      for (const student of students) {
-        const status = attendance[student.rollNo] || "Absent";
+      const token = localStorage.getItem("token");
+      const payload = Object.keys(draftAttendance).map((rollNo) => ({
+        rollNo,
+        status: draftAttendance[rollNo] || "Present",
+      }));
 
-        const response = await fetch("http://localhost:3000/api/attendance", {
+      const res = await fetch(
+        "http://localhost:3000/api/students/attendance/lock-daily",
+        {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
-            rollNo: student.rollNo,
-            date,
-            status,
+            date: selectedDate,
+            records: payload,
           }),
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-          alert(
-            `Failed for Roll No. ${student.rollNo}: ${
-              data.message || "Something went wrong"
-            }`
-          );
-          return;
         }
+      );
+
+      const result = await res.json();
+      if (res.ok && result.success) {
+        alert("Attendance saved and locked successfully!");
+        fetchDailyAttendance(selectedDate);
+      } else {
+        alert(result.message || "Failed to save attendance.");
       }
-
-      alert("Attendance saved successfully!");
-
-      fetchAttendance(date);
-
-    } catch (error) {
-      console.error("Error saving attendance:", error);
-      alert("Something went wrong while saving attendance.");
+    } catch (err) {
+      console.error("Error locking attendance:", err);
+      alert("Error connecting to server while locking attendance.");
     }
   };
 
   return (
-    <main className="dashboard">
-      <h1>Attendance</h1>
+    <div style={{ padding: "20px", maxWidth: "1000px", margin: "0 auto" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+        <h2>Daily Attendance Register</h2>
+        {!isLocked && attendanceList.length > 0 && (
+          <button onClick={handleSaveAndLock} style={lockBtnStyle}>
+            🔒 Save & Lock Attendance
+          </button>
+        )}
+      </div>
 
-      <p>Mark attendance for all students.</p>
+      <div style={{ display: "flex", alignItems: "center", gap: "15px", marginBottom: "20px", backgroundColor: "#f8fafc", padding: "12px 16px", borderRadius: "6px", border: "1px solid #e2e8f0" }}>
+        <label style={{ fontWeight: "bold", color: "#334155" }}>Select Date:</label>
+        <input
+          type="date"
+          value={selectedDate}
+          onChange={(e) => setSelectedDate(e.target.value)}
+          style={dateInputStyle}
+        />
+        <span style={{ marginLeft: "auto", fontSize: "14px", fontWeight: "600", color: isLocked ? "#16a34a" : "#d97706" }}>
+          Status: {isLocked ? "🔒 Locked & Saved" : "📝 Unlocked (Editable)"}
+        </span>
+      </div>
 
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Date</label>
+      {loading ? (
+        <div style={{ padding: "20px" }}>Loading attendance records...</div>
+      ) : (
+        <table style={tableStyle}>
+          <thead>
+            <tr style={headerRowStyle}>
+              <th style={cellStyle}>Roll No</th>
+              <th style={cellStyle}>Name</th>
+              <th style={cellStyle}>Course</th>
+              <th style={cellStyle}>Year</th>
+              <th style={cellStyle}>Status ({selectedDate})</th>
+            </tr>
+          </thead>
+          <tbody>
+            {attendanceList.map((student) => {
+              const currentStatus = draftAttendance[student.rollNo] || "Present";
 
-          <input
-            type="date"
-            value={date}
-            max={new Date().toISOString().split("T")[0]}
-            onChange={(e) => {
-              const selectedDate = e.target.value;
-
-              setDate(selectedDate);
-              fetchAttendance(selectedDate);
-            }}
-          />
-        </div>
-
-        <h2>Student Attendance</h2>
-
-        <div className="students-table-container">
-          <table className="students-table">
-            <thead>
-              <tr>
-                <th>Roll No.</th>
-                <th>Name</th>
-                <th>Attendance</th>
-              </tr>
-            </thead>
-            
-            <tbody>
-              {[...students]
-                .sort((a, b) => a.rollNo - b.rollNo)
-                .map((student) => (
-                  <tr key={student.rollNo}>
-                    <td>{student.rollNo}</td>
-
-                    <td>{student.name}</td>
-
-                    <td>
-                      <select
-                        value={attendance[student.rollNo] || "Absent"}
-                        onChange={(e) =>
-                          handleStatusChange(
-                            student.rollNo,
-                            e.target.value
-                          )
-                        }
-                      >
-                        <option value="Present">Present</option>
-                        <option value="Absent">Absent</option>
-                      </select>
-                    </td>
-                  </tr>
-                ))}
-            </tbody>
-          </table>
-        </div>
-
-        <button type="submit">Save Attendance</button>
-      </form>
-    </main>
+              return (
+                <tr key={student.rollNo} style={rowStyle}>
+                  <td style={cellStyle}>{student.rollNo}</td>
+                  <td style={cellStyle}><strong>{student.name}</strong></td>
+                  <td style={cellStyle}>{student.course || "N/A"}</td>
+                  <td style={cellStyle}>{student.year || "4th Year"}</td>
+                  <td style={cellStyle}>
+                    {isLocked ? (
+                      <span style={getStatusBadgeStyle(student.status)}>
+                        {student.status.toUpperCase()}
+                      </span>
+                    ) : (
+                      <div>
+                        <button
+                          type="button"
+                          onClick={() => handleSelectStatus(student.rollNo, "Present")}
+                          style={presentBtnStyle(currentStatus)}
+                        >
+                          Present
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleSelectStatus(student.rollNo, "Absent")}
+                          style={absentBtnStyle(currentStatus)}
+                        >
+                          Absent
+                        </button>
+                      </div>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      )}
+    </div>
   );
 }
 
-export default Attendance;
+const lockBtnStyle = { backgroundColor: "#16a34a", color: "#ffffff", border: "none", padding: "10px 18px", borderRadius: "6px", cursor: "pointer", fontWeight: "bold" };
+const dateInputStyle = { padding: "8px 12px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "14px" };
+
+const getStatusBadgeStyle = (status) => {
+  const clean = (status || "").toLowerCase();
+  return {
+    padding: "6px 12px",
+    borderRadius: "20px",
+    fontWeight: "bold",
+    fontSize: "12px",
+    display: "inline-block",
+    backgroundColor: clean === "present" ? "#dcfce7" : clean === "absent" ? "#fee2e2" : "#f1f5f9",
+    color: clean === "present" ? "#15803d" : clean === "absent" ? "#b91c1c" : "#64748b",
+  };
+};
+
+const presentBtnStyle = (status) => ({
+  backgroundColor: status === "Present" ? "#15803d" : "#e2e8f0",
+  color: status === "Present" ? "#ffffff" : "#334155",
+  border: "none",
+  padding: "6px 14px",
+  borderRadius: "4px",
+  cursor: "pointer",
+  marginRight: "8px",
+  fontWeight: "bold",
+});
+
+const absentBtnStyle = (status) => ({
+  backgroundColor: status === "Absent" ? "#b91c1c" : "#e2e8f0",
+  color: status === "Absent" ? "#ffffff" : "#334155",
+  border: "none",
+  padding: "6px 14px",
+  borderRadius: "4px",
+  cursor: "pointer",
+  fontWeight: "bold",
+});
+
+const tableStyle = { width: "100%", borderCollapse: "collapse", marginTop: "10px", backgroundColor: "#ffffff", boxShadow: "0 1px 3px rgba(0,0,0,0.1)", borderRadius: "8px", overflow: "hidden" };
+const headerRowStyle = { backgroundColor: "#f8fafc", textAlign: "left", borderBottom: "2px solid #e2e8f0" };
+const rowStyle = { borderBottom: "1px solid #e2e8f0" };
+const cellStyle = { padding: "12px 16px" };

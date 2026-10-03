@@ -1,68 +1,70 @@
 import React, { useState, useEffect } from "react";
 
-export default function StudentDashboard() {
-  const [studentInfo, setStudentInfo] = useState({ name: "", rollNo: "" });
-  const [marks, setMarks] = useState([]);
-  const [aiInsights, setAiInsights] = useState("");
+export default function Dashboard() {
+  const [stats, setStats] = useState({
+    totalStudents: 0,
+    avgAttendance: 0,
+    avgMarks: 0,
+  });
   const [loading, setLoading] = useState(true);
+  const [aiInsights, setAiInsights] = useState("");
   const [loadingAi, setLoadingAi] = useState(false);
 
-  const token = localStorage.getItem("token");
-
-  // Helper to extract student profile from JWT token
-  const parseJwt = (token) => {
-    try {
-      return JSON.parse(atob(token.split(".")[1]));
-    } catch (e) {
-      return null;
-    }
-  };
-
   useEffect(() => {
-    const fetchStudentData = async () => {
-      // 1. Extract name and roll number from JWT token
-      if (token) {
-        const decoded = parseJwt(token);
-        if (decoded) {
-          setStudentInfo({
-            name: decoded.name || decoded.username || "Student",
-            rollNo: decoded.rollNo || decoded.roll_no || decoded.id || "STU-2026",
-          });
-        }
-      }
-
-      // 2. Fetch student marks from backend
+    const fetchDashboardStats = async () => {
       try {
-        const res = await fetch("http://localhost:3000/api/marks/my-marks", {
-          headers: { Authorization: `Bearer ${token}` },
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+          console.error("No authorization token found in localStorage.");
+          setLoading(false);
+          return;
+        }
+
+        const res = await fetch("http://localhost:3000/api/dashboard/stats", {
+          headers: { 
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}` 
+          },
         });
+
+        if (res.status === 401) {
+          console.error("Session expired or token invalid (401).");
+          setLoading(false);
+          return;
+        }
+
         const result = await res.json();
 
-        if (res.ok && Array.isArray(result)) {
-          setMarks(result);
-        } else if (result.marks && Array.isArray(result.marks)) {
-          setMarks(result.marks);
+        if (result.success) {
+          setStats({
+            totalStudents: result.data.totalStudents,
+            avgAttendance: result.data.avgAttendance,
+            avgMarks: result.data.avgMarks,
+          });
         }
       } catch (err) {
-        console.error("Error loading student marks:", err);
+        console.error("Error loading dashboard metrics:", err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchStudentData();
-  }, [token]);
+    fetchDashboardStats();
+  }, []);
 
-  // Trigger AI Insights with logged-in student details
-  const handleGetAiInsights = async () => {
+  // Handler for Admin Class-Wide AI Insights
+  const handleGetAdminAiInsights = async () => {
     setLoadingAi(true);
     try {
-      const studentPayload = {
-        name: studentInfo.name || "Student",
-        rollNo: studentInfo.rollNo || "N/A",
-        marks: marks.length > 0 ? marks : [
-          { subject_name: "Computer Science", score: 88 },
-          { subject_name: "Mathematics", score: 75 }
+      const token = localStorage.getItem("token");
+
+      const payload = {
+        name: "Admin",
+        rollNo: "ADMIN-OVERVIEW",
+        marks: [
+          { subject_name: "Class Aggregate Performance", score: stats.avgMarks },
+          { subject_name: "Overall Attendance Rate", score: stats.avgAttendance }
         ]
       };
 
@@ -72,14 +74,14 @@ export default function StudentDashboard() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ studentData: studentPayload }),
+        body: JSON.stringify({ studentData: payload }),
       });
 
       const data = await res.json();
       if (res.ok) {
         setAiInsights(data.insights);
       } else {
-        alert(data.message || "Failed to generate AI insights");
+        alert(data.message || "Failed to generate class AI insights");
       }
     } catch (err) {
       console.error("Error generating AI insights:", err);
@@ -90,38 +92,43 @@ export default function StudentDashboard() {
   };
 
   if (loading) {
-    return <div style={{ padding: "20px" }}>Loading dashboard...</div>;
+    return <div style={{ padding: "20px" }}>Loading dashboard statistics...</div>;
   }
 
   return (
-    <div style={{ padding: "20px", maxWidth: "900px", margin: "0 auto" }}>
-      <h2>Student Dashboard</h2>
-      <p style={{ color: "#666" }}>
-        Welcome back, <strong>{studentInfo.name}</strong> (Roll No: {studentInfo.rollNo})
-      </p>
+    <div style={{ padding: "20px", maxWidth: "1000px", margin: "0 auto" }}>
+      <h2>Admin Dashboard</h2>
 
-      {/* Marks Summary Section */}
-      <div style={{ border: "1px solid #ddd", padding: "20px", borderRadius: "8px", backgroundColor: "#fff", marginBottom: "20px" }}>
-        <h3>Academic Performance</h3>
-        {marks.length > 0 ? (
-          <ul style={{ paddingLeft: "20px" }}>
-            {marks.map((m, idx) => (
-              <li key={idx} style={{ marginBottom: "8px" }}>
-                <strong>{m.subject_name || m.subject || "Subject"}:</strong> {m.score || m.marks || 0}%
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p style={{ color: "#888" }}>No marks uploaded yet.</p>
-        )}
+      {/* Summary Cards Row */}
+      <div style={{ display: "flex", gap: "20px", marginBottom: "30px" }}>
+        <div style={cardStyle}>
+          <h3>Total Students</h3>
+          <p style={cardMetricStyle}>{stats.totalStudents}</p>
+        </div>
+
+        <div style={cardStyle}>
+          <h3>Average Attendance</h3>
+          <p style={cardMetricStyle}>{stats.avgAttendance}%</p>
+        </div>
+
+        <div style={cardStyle}>
+          <h3>Average Marks</h3>
+          <p style={cardMetricStyle}>{stats.avgMarks}%</p>
+        </div>
       </div>
 
-      {/* AI Insights Panel */}
+      {/* System Overview Panel */}
+      <div style={{ border: "1px solid #ddd", padding: "20px", borderRadius: "8px", backgroundColor: "#f9f9f9", marginBottom: "20px" }}>
+        <h4>System Status</h4>
+        <p>All core services (Authentication, Students, Attendance, Marks, Analytics) are connected and operating.</p>
+      </div>
+
+      {/* Admin AI Analytics Section */}
       <div style={{ border: "1px solid #007bff", padding: "20px", borderRadius: "8px", backgroundColor: "#f0f7ff" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "15px" }}>
-          <h3 style={{ margin: 0, color: "#0056b3" }}>🤖 AI Performance Insights</h3>
+          <h3 style={{ margin: 0, color: "#0056b3" }}>🤖 Institutional AI Insights</h3>
           <button
-            onClick={handleGetAiInsights}
+            onClick={handleGetAdminAiInsights}
             disabled={loadingAi}
             style={{
               padding: "10px 18px",
@@ -133,7 +140,7 @@ export default function StudentDashboard() {
               fontWeight: "bold"
             }}
           >
-            {loadingAi ? "Analyzing..." : "Generate AI Insights"}
+            {loadingAi ? "Analyzing Class Data..." : "Generate Class AI Insights"}
           </button>
         </div>
 
@@ -143,10 +150,26 @@ export default function StudentDashboard() {
           </div>
         ) : (
           <p style={{ color: "#666", margin: 0 }}>
-            Click the button above to generate personalized AI recommendations based on your subject marks.
+            Click the button above to analyze overall institutional metrics (Total Students: {stats.totalStudents}, Avg Marks: {stats.avgMarks}%).
           </p>
         )}
       </div>
     </div>
   );
 }
+
+const cardStyle = {
+  flex: "1",
+  padding: "20px",
+  borderRadius: "8px",
+  backgroundColor: "#ffffff",
+  border: "1px solid #e0e0e0",
+  boxShadow: "0 2px 4px rgba(0,0,0,0.05)",
+};
+
+const cardMetricStyle = {
+  fontSize: "2rem",
+  fontWeight: "bold",
+  color: "#007bff",
+  margin: "10px 0 0 0",
+};

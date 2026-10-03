@@ -1,10 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const { generateStudentInsights } = require("../services/aiService");
-const { verifyToken } = require("../middleware/authMiddleware"); // Adjust path/name to match your middleware
 
-// Protect route with JWT verification
-router.post("/insights", verifyToken, async (req, res) => {
+// Direct import matching module.exports = authMiddleware
+const authMiddleware = require("../middleware/authMiddleware");
+
+// Attach authMiddleware to protect the AI insights route
+router.post("/insights", authMiddleware, async (req, res) => {
   try {
     const { studentData } = req.body;
 
@@ -15,17 +17,17 @@ router.post("/insights", verifyToken, async (req, res) => {
     };
 
     const insights = await generateStudentInsights(payload);
-    
-    return res.status(200).json({ 
-      success: true, 
-      insights 
+
+    return res.status(200).json({
+      success: true,
+      insights
     });
   } catch (error) {
     console.error("AI Insights Endpoint Error:", error);
-    return res.status(500).json({ 
-      success: false, 
-      message: "Failed to generate AI insights.", 
-      error: error.message 
+    return res.status(500).json({
+      success: false,
+      message: "Failed to generate AI insights.",
+      error: error.message
     });
   }
 });
