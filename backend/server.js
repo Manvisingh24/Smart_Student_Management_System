@@ -33,7 +33,6 @@ app.get("/", (req, res) => {
     res.send("Smart Student Management System Backend is Running!");
 });
 
-
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
